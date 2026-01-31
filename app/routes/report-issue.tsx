@@ -13,7 +13,7 @@ export default function ReportIssue() {
     });
     const [errors, setErrors] = useState<any>({});
 
-    // 
+
 
     const validateStep = (currentStep: number) => {
         let isValid = true;
