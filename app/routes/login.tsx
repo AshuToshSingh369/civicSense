@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Form, Link, useNavigate } from "react-router";
 import type { Route } from "./+types/login";
 import AuthSidebar from "../components/AuthSidebar";
+import { useAuth } from "../context/AuthContext";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -16,6 +17,8 @@ export default function Login() {
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState({ identifier: "", password: "" });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { login: authLogin } = useAuth();
 
     const validate = () => {
         let isValid = true;
@@ -46,12 +49,39 @@ export default function Login() {
         return isValid;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (validate()) {
-            // Mock Success
-            if (role === "citizen") navigate("/dashboard");
-            else navigate("/authority/dashboard");
+        if (!validate()) return;
+
+        setIsSubmitting(true);
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: identifier,
+                    password: password
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+
+            // Success
+            authLogin(data);
+            if (data.role === "authority" || data.role === "admin") {
+                navigate("/authority-dashboard");
+            } else {
+                navigate("/dashboard");
+            }
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || "Invalid credentials");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -60,9 +90,12 @@ export default function Login() {
 
             {/* Reusable Sidebar */}
             <AuthSidebar
-                title1="Welcome Back,"
-                title2="Citizen."
-                subtitle="Log in to check the status of your reports and stay connected with your local government."
+                title1={role === "citizen" ? "Welcome Back," : "Official Portal,"}
+                title2={role === "citizen" ? "Citizen." : "Authority."}
+                subtitle={role === "citizen"
+                    ? "Log in to check the status of your reports and stay connected with your local government."
+                    : "Access the municipal command centre to manage public infrastructure and citizen reports."
+                }
             />
 
             {/* Right Panel - Professional Login Form */}
@@ -109,12 +142,12 @@ export default function Login() {
                     <Form onSubmit={handleSubmit} className="space-y-6" noValidate>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                {role === "citizen" ? "Mobile Number / Email" : "Department ID"}
+                                Email Address
                             </label>
                             <input
-                                type="text"
+                                type="email"
                                 className={`input-gov ${errors.identifier ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
-                                placeholder={role === "citizen" ? "e.g., 9841XXXXXX" : "e.g., KTM-WARD-04-ADMIN"}
+                                placeholder="e.g., ram@example.com"
                                 value={identifier}
                                 onChange={(e) => {
                                     setIdentifier(e.target.value);
@@ -123,6 +156,8 @@ export default function Login() {
                             />
                             {errors.identifier && <p className="text-red-600 text-xs mt-1 font-medium">{errors.identifier}</p>}
                         </div>
+
+
 
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Password</label>
@@ -147,8 +182,12 @@ export default function Login() {
                             <Link to="#" className="text-blue-700 font-bold hover:underline">Forgot password?</Link>
                         </div>
 
-                        <button type="submit" className="w-full btn-primary py-4 shadow-lg shadow-blue-900/10">
-                            Secure Login
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className={`w-full btn-primary py-4 shadow-lg shadow-blue-900/10 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        >
+                            {isSubmitting ? 'Logging in...' : 'Secure Login'}
                         </button>
                     </Form>
 

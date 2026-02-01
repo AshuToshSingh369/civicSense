@@ -1,8 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Form, Link, useNavigate } from "react-router";
+import { useAuth } from "../context/AuthContext";
+
+const JURISDICTIONS: Record<string, string[]> = {
+    "Kathmandu": ["Ward 1 - Central", "Ward 2 - Thamel", "Ward 3 - Maharajgunj", "Ward 4 - Baluwatar"],
+    "Pokhara": ["Ward 5 - Lakeside", "Ward 6 - Baidam", "Ward 17 - Birauta", "Ward 9 - New Road"],
+    "Lalitpur": ["Ward 3 - Pulchowk", "Ward 4 - Jhamsikhel", "Ward 5 - Jawalakhel", "Ward 2 - Sanepa"],
+    "Bharatpur": ["Ward 10 - Chautari", "Ward 1 - Narayangarh", "Ward 12 - Bypass"],
+    "Biratnagar": ["Ward 2 - Main Road", "Ward 7 - Bazaar", "Ward 9 - Airport Road"],
+};
 
 export default function ReportIssue() {
     const navigate = useNavigate();
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         image: null as string | null,
@@ -10,10 +20,18 @@ export default function ReportIssue() {
         landmark: "",
         category: "",
         description: "",
+        tempCity: "",
+        targetDepartment: "",
     });
     const [errors, setErrors] = useState<any>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user } = useAuth();
 
-
+    useEffect(() => {
+        if (user?.homeDepartment && !formData.targetDepartment) {
+            setFormData(prev => ({ ...prev, targetDepartment: user.homeDepartment! }));
+        }
+    }, [user]);
 
     const validateStep = (currentStep: number) => {
         let isValid = true;
@@ -29,6 +47,10 @@ export default function ReportIssue() {
         if (currentStep === 2) {
             if (!formData.landmark.trim()) {
                 newErrors.landmark = "Please enter a landmark or Tole name.";
+                isValid = false;
+            }
+            if (!formData.targetDepartment) {
+                newErrors.targetDepartment = "Please select a department.";
                 isValid = false;
             }
         }
@@ -59,15 +81,59 @@ export default function ReportIssue() {
         else navigate(-1);
     };
 
-    const handleSubmit = () => {
-        if (validateStep(3)) {
+    const handleSubmit = async () => {
+        if (!validateStep(3)) return;
+
+        setIsSubmitting(true);
+        try {
+            const reportData = {
+                title: `${formData.category} at ${formData.landmark}`,
+                description: formData.description,
+                location: formData.landmark,
+                category: formData.category,
+                coordinates: { lat: 27.67, lng: 85.32 }, // Hardcoded for now as per UI
+                imageUrl: formData.image,
+                targetDepartment: formData.targetDepartment,
+                status: 'pending'
+            };
+
+            const response = await fetch('/api/reports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?.token}`
+                },
+                body: JSON.stringify(reportData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit report');
+            }
+
+            // Success
             navigate("/dashboard");
+        } catch (error) {
+            console.error(error);
+            alert("Failed to submit report. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, image: reader.result as string }));
+                if (errors.image) setErrors({ ...errors, image: null });
+            };
+            reader.readAsDataURL(file);
         }
     };
 
     const handleImageUpload = () => {
-        setFormData(prev => ({ ...prev, image: "mock-image-url" }));
-        if (errors.image) setErrors({ ...errors, image: null });
+        fileInputRef.current?.click();
     };
 
     return (
@@ -81,9 +147,9 @@ export default function ReportIssue() {
                     className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay"
                 />
                 <div className="p-8 relative z-10 text-white h-full flex flex-col">
-                    <Link to="/" className="text-white/80 hover:text-white font-bold mb-12 flex items-center gap-2">
+                    <button onClick={() => navigate(-1)} className="text-white/80 hover:text-white font-bold mb-12 flex items-center gap-2 w-fit">
                         <span>←</span> Back
-                    </Link>
+                    </button>
 
                     <div className="mt-auto mb-12">
                         <h2 className="text-3xl font-bold mb-4">Make a Difference</h2>
@@ -140,16 +206,26 @@ export default function ReportIssue() {
                                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Capture Evidence</h2>
                                 <p className="text-gray-500 mb-8 text-lg">Take a photo of the issue for verification.</p>
 
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    capture="environment"
+                                    onChange={handleFileChange}
+                                />
+
                                 <div
                                     onClick={handleImageUpload}
-                                    className={`border-2 border-dashed ${formData.image ? 'border-green-500 bg-green-50' : 'border-blue-300 bg-blue-50'} rounded-2xl h-80 flex flex-col items-center justify-center gap-6 hover:bg-white transition-all cursor-pointer group shadow-inner`}
+                                    className={`border-2 border-dashed ${formData.image ? 'border-green-500 bg-green-50' : 'border-blue-300 bg-blue-50'} rounded-2xl h-80 flex flex-col items-center justify-center gap-6 hover:bg-white transition-all cursor-pointer group shadow-inner relative overflow-hidden`}
                                 >
                                     {formData.image ? (
                                         <>
-                                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 animate-bounce-slow">
+                                            <img src={formData.image} className="absolute inset-0 w-full h-full object-cover opacity-20" alt="Preview" />
+                                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 animate-bounce-slow relative z-10">
                                                 <span className="text-3xl">✓</span>
                                             </div>
-                                            <div className="text-center">
+                                            <div className="text-center relative z-10">
                                                 <span className="font-bold text-green-700 text-xl block">Photo Captured</span>
                                                 <span className="text-sm text-gray-500">Tap to retake</span>
                                             </div>
@@ -206,6 +282,44 @@ export default function ReportIssue() {
                                     {errors.landmark && <p className="text-red-600 text-xs mt-1 font-bold">{errors.landmark}</p>}
                                 </div>
 
+                                <div className="mb-8 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">City</label>
+                                        <select
+                                            className="input-gov text-lg py-4"
+                                            value={formData.tempCity}
+                                            onChange={(e) => setFormData({ ...formData, tempCity: e.target.value, targetDepartment: "" })}
+                                        >
+                                            <option value="">Select City</option>
+                                            {Object.keys(JURISDICTIONS).map(city => (
+                                                <option key={city} value={city}>{city}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {formData.tempCity && (
+                                        <div className="animate-fade-in-down">
+                                            <label className="block text-sm font-bold text-gray-700 mb-2">Target Ward</label>
+                                            <select
+                                                className={`input-gov text-lg py-4 ${errors.targetDepartment ? 'border-red-500' : ''}`}
+                                                value={formData.targetDepartment}
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, targetDepartment: e.target.value });
+                                                    if (errors.targetDepartment) setErrors({ ...errors, targetDepartment: null });
+                                                }}
+                                            >
+                                                <option value="">Select Ward</option>
+                                                {JURISDICTIONS[formData.tempCity].map(ward => (
+                                                    <option key={ward} value={`${formData.tempCity} - ${ward}`}>{ward}</option>
+                                                ))}
+                                            </select>
+                                            {errors.targetDepartment && <p className="text-red-600 text-xs mt-1 font-bold">{errors.targetDepartment}</p>}
+                                        </div>
+                                    )}
+                                    <p className="text-[10px] text-gray-400 mt-1 italic">
+                                        Defaults to your home jurisdiction. Change this if reporting from a different city or ward.
+                                    </p>
+                                </div>
+
                                 <div className="flex gap-4">
                                     <button onClick={handleBack} className="btn-secondary flex-1 py-4">Back</button>
                                     <button onClick={handleNext} className="btn-primary flex-[2] py-4 shadow-xl shadow-blue-900/20">Confirm & Next</button>
@@ -254,8 +368,12 @@ export default function ReportIssue() {
 
                                 <div className="flex gap-4">
                                     <button onClick={handleBack} className="btn-secondary flex-1 py-4">Back</button>
-                                    <button onClick={handleSubmit} className="btn-primary flex-[2] bg-green-600 hover:bg-green-700 border-green-600 shadow-xl shadow-green-900/20 py-4 text-lg">
-                                        Submit Report
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting}
+                                        className={`btn-primary flex-[2] bg-green-600 hover:bg-green-700 border-green-600 shadow-xl shadow-green-900/20 py-4 text-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit Report'}
                                     </button>
                                 </div>
                             </div>

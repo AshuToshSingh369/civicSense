@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Form, Link, useNavigate } from "react-router";
 import type { Route } from "./+types/signup";
 import AuthSidebar from "../components/AuthSidebar";
+import { useAuth } from "../context/AuthContext";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -10,15 +11,27 @@ export function meta({ }: Route.MetaArgs) {
     ];
 }
 
+const JURISDICTIONS: Record<string, string[]> = {
+    "Kathmandu": ["Ward 1 - Central", "Ward 2 - Thamel", "Ward 3 - Maharajgunj", "Ward 4 - Baluwatar"],
+    "Pokhara": ["Ward 5 - Lakeside", "Ward 6 - Baidam", "Ward 17 - Birauta", "Ward 9 - New Road"],
+    "Lalitpur": ["Ward 3 - Pulchowk", "Ward 4 - Jhamsikhel", "Ward 5 - Jawalakhel", "Ward 2 - Sanepa"],
+    "Bharatpur": ["Ward 10 - Chautari", "Ward 1 - Narayangarh", "Ward 12 - Bypass"],
+    "Biratnagar": ["Ward 2 - Main Road", "Ward 7 - Bazaar", "Ward 9 - Airport Road"],
+};
+
 export default function Signup() {
     const navigate = useNavigate();
     const [role, setRole] = useState<"citizen" | "authority">("citizen");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { login: authLogin } = useAuth();
 
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
         email: "",
         deptCode: "",
+        homeDepartment: "",
+        tempCity: "",
         password: "",
         confirmPassword: ""
     });
@@ -32,11 +45,16 @@ export default function Signup() {
         confirmPassword: ""
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         if (errors[name as keyof typeof errors]) {
             setErrors(prev => ({ ...prev, [name]: "" }));
+        }
+
+        // Reset ward if city changes
+        if (name === "tempCity") {
+            setFormData(prev => ({ ...prev, homeDepartment: "" }));
         }
     };
 
@@ -79,10 +97,43 @@ export default function Signup() {
         return isValid;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (validate()) {
-            navigate("/verify-otp");
+        if (!validate()) return;
+
+        setIsSubmitting(true);
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: `${formData.firstName} ${formData.lastName}`,
+                    email: formData.email,
+                    password: formData.password,
+                    role: role,
+                    departmentCode: formData.deptCode,
+                    homeDepartment: formData.homeDepartment
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Signup failed');
+            }
+
+            // Success
+            authLogin(data);
+            if (data.role === "authority" || data.role === "admin") {
+                navigate("/authority-dashboard");
+            } else {
+                navigate("/dashboard");
+            }
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || "Failed to register. Please try again.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -137,11 +188,74 @@ export default function Signup() {
                             {errors.email && <span className="text-red-500 text-xs">{errors.email}</span>}
                         </div>
 
+                        {role === "citizen" && (
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">City</label>
+                                    <select
+                                        name="tempCity"
+                                        className="input-gov"
+                                        onChange={handleChange}
+                                        value={formData.tempCity} // Bind value
+                                    >
+                                        <option value="">Select City</option>
+                                        {Object.keys(JURISDICTIONS).map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {formData.tempCity && ( // Use formData.tempCity directly
+                                    <div className="animate-fade-in-down">
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Ward Number</label>
+                                        <select
+                                            name="homeDepartment"
+                                            className="input-gov"
+                                            value={formData.homeDepartment}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="">Select Ward</option>
+                                            {JURISDICTIONS[formData.tempCity].map(ward => ( // Use formData.tempCity directly
+                                                <option key={ward} value={`${formData.tempCity} - ${ward}`}>{ward}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {role === "authority" && (
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Department Code</label>
-                                <input name="deptCode" type="text" className={`input-gov ${errors.deptCode ? 'border-red-500' : ''}`} placeholder="Enter Code" value={formData.deptCode} onChange={handleChange} />
-                                {errors.deptCode && <span className="text-red-500 text-xs">{errors.deptCode}</span>}
+                            <div className="space-y-5">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">City</label>
+                                    <select
+                                        name="tempCity"
+                                        className="input-gov"
+                                        onChange={handleChange}
+                                        value={formData.tempCity} // Bind value
+                                    >
+                                        <option value="">Select City</option>
+                                        {Object.keys(JURISDICTIONS).map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {formData.tempCity && (
+                                    <div className="animate-fade-in-down">
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Primary Jurisdiction</label>
+                                        <select
+                                            name="deptCode"
+                                            className="input-gov"
+                                            value={formData.deptCode}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="">Select Ward</option>
+                                            {JURISDICTIONS[formData.tempCity].map(ward => (
+                                                <option key={ward} value={`${formData.tempCity} - ${ward}`}>{ward}</option>
+                                            ))}
+                                        </select>
+                                        <p className="text-[10px] text-gray-400 mt-1">This sets your official municipal oversight area.</p>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -157,8 +271,12 @@ export default function Signup() {
                             {errors.confirmPassword && <span className="text-red-500 text-xs">{errors.confirmPassword}</span>}
                         </div>
 
-                        <button type="submit" className="w-full btn-primary py-4 shadow-lg shadow-blue-900/10">
-                            Verify & Register
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className={`w-full btn-primary py-4 shadow-lg shadow-blue-900/10 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        >
+                            {isSubmitting ? 'Processing...' : 'Verify & Register'}
                         </button>
                     </Form>
 

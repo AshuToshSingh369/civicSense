@@ -1,21 +1,49 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
-    // Mock Data
-    const myReports = [
-        { id: "123456", category: "Pothole", location: "Sector 4, Main Road", date: "Jan 30, 2026", status: "In Progress" },
-        { id: "123455", category: "Garbage", location: "Park Gate No. 2", date: "Jan 28, 2026", status: "Resolved" },
-        { id: "123450", category: "Streetlight", location: "Near School", date: "Jan 15, 2026", status: "Rejected" },
-    ];
+    const navigate = useNavigate();
+    const [reports, setReports] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { user, logout } = useAuth();
+
+    useEffect(() => {
+        const fetchReports = async () => {
+            if (!user?.token) return;
+            try {
+                const response = await fetch('/api/reports', {
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`
+                    }
+                });
+                const data = await response.json();
+                setReports(data);
+            } catch (error) {
+                console.error("Failed to fetch reports:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchReports();
+    }, [user]);
 
     const getStatusColor = (status: string) => {
-        switch (status) {
-            case "Resolved": return "bg-green-100 text-green-700 border-green-200";
-            case "In Progress": return "bg-amber-100 text-amber-700 border-amber-200";
-            case "Rejected": return "bg-red-100 text-red-700 border-red-200";
-            case "Submitted": return "bg-blue-100 text-blue-700 border-blue-200";
+        switch (status?.toLowerCase()) {
+            case "resolved": return "bg-green-100 text-green-700 border-green-200";
+            case "in-progress": return "bg-amber-100 text-amber-700 border-amber-200";
+            case "rejected": return "bg-red-100 text-red-700 border-red-200";
+            case "pending": return "bg-blue-100 text-blue-700 border-blue-200";
             default: return "bg-gray-100 text-gray-600 border-gray-200";
         }
+    };
+
+    const stats = {
+        total: reports.length,
+        resolved: reports.filter(r => r.status?.toLowerCase() === 'resolved').length,
+        inProgress: reports.filter(r => r.status?.toLowerCase() === 'in-progress').length,
+        pending: reports.filter(r => r.status?.toLowerCase() === 'pending').length,
     };
 
     return (
@@ -32,8 +60,16 @@ export default function Dashboard() {
                     </Link>
 
                     <div className="flex items-center gap-6">
-                        <span className="text-sm font-medium text-blue-100 hidden sm:block">Namaste, Ashutosh</span>
-                        <Link to="/login" className="text-sm text-white/80 hover:text-white font-bold hover:underline transition-colors">Sign Out</Link>
+                        <span className="text-sm font-medium text-blue-100 hidden sm:block">Namaste, {user?.name || 'Guest'}</span>
+                        <button
+                            onClick={() => {
+                                logout();
+                                navigate('/login');
+                            }}
+                            className="text-sm text-white/80 hover:text-white font-bold hover:underline transition-colors"
+                        >
+                            Sign Out
+                        </button>
                     </div>
                 </div>
             </header>
@@ -54,8 +90,8 @@ export default function Dashboard() {
                             👤
                         </div>
                         <div className="mb-2">
-                            <h1 className="text-3xl font-bold text-gray-900">Ashutosh's Impact</h1>
-                            <p className="text-gray-600 font-medium">Citizen ID: 9841-XXXXXX</p>
+                            <h1 className="text-3xl font-bold text-gray-900">{user?.name || 'Your'}'s Impact</h1>
+                            <p className="text-gray-600 font-medium">Citizen Role: {user?.role || 'Guest'}</p>
                         </div>
                     </div>
                 </div>
@@ -66,19 +102,19 @@ export default function Dashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                     <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-lg shadow-gray-200/50 hover:-translate-y-1 transition-transform">
                         <span className="text-gray-400 text-xs font-bold uppercase block mb-2">Total Reports</span>
-                        <span className="text-4xl font-bold text-gray-900">12</span>
+                        <span className="text-4xl font-bold text-gray-900">{stats.total}</span>
                     </div>
                     <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-lg shadow-gray-200/50 hover:-translate-y-1 transition-transform">
                         <span className="text-green-600 text-xs font-bold uppercase block mb-2">Resolved</span>
-                        <span className="text-4xl font-bold text-green-600">8</span>
+                        <span className="text-4xl font-bold text-green-600">{stats.resolved}</span>
                     </div>
                     <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-lg shadow-gray-200/50 hover:-translate-y-1 transition-transform">
                         <span className="text-amber-600 text-xs font-bold uppercase block mb-2">In Progress</span>
-                        <span className="text-4xl font-bold text-amber-600">3</span>
+                        <span className="text-4xl font-bold text-amber-600">{stats.inProgress}</span>
                     </div>
                     <div className="bg-white p-6 rounded-xl border border-blue-100 shadow-lg shadow-blue-900/10 hover:-translate-y-1 transition-transform bg-gradient-to-br from-white to-blue-50">
                         <span className="text-blue-600 text-xs font-bold uppercase block mb-2">Impact Score</span>
-                        <span className="text-4xl font-bold text-blue-700">850</span>
+                        <span className="text-4xl font-bold text-blue-700">{stats.resolved * 100 + stats.inProgress * 20}</span>
                     </div>
                 </div>
 
@@ -90,33 +126,60 @@ export default function Dashboard() {
                     </Link>
                 </div>
 
-                {/* Reports List */}
                 <div className="space-y-4">
-                    {myReports.map((report) => (
-                        <div key={report.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-blue-300 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group cursor-pointer relative overflow-hidden">
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-200 group-hover:bg-blue-500 transition-colors"></div>
-
-                            <div className="pl-2">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <span className="font-mono text-xs text-gray-400 font-bold">#{report.id}</span>
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusColor(report.status)} uppercase tracking-wide`}>
-                                        {report.status}
-                                    </span>
-                                </div>
-                                <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-700 transition-colors">{report.category} Issue</h3>
-                                <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
-                                    <span>📍</span> {report.location}
-                                </p>
-                            </div>
-
-                            <div className="flex items-center gap-4 w-full md:w-auto mt-2 md:mt-0">
-                                <span className="text-xs text-gray-400 font-medium">{report.date}</span>
-                                <Link to={`/track-report?id=${report.id}`} className="btn-secondary py-2 px-6 text-sm font-bold bg-gray-50 hover:bg-white border-gray-200 ml-auto md:ml-0">
-                                    View Details
-                                </Link>
-                            </div>
+                    {loading ? (
+                        <div className="text-center py-20 grayscale opacity-50">
+                            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <p className="font-bold text-gray-400">Loading your reports...</p>
                         </div>
-                    ))}
+                    ) : reports.length > 0 ? (
+                        reports.map((report) => (
+                            <div key={report._id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-blue-300 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group cursor-pointer relative overflow-hidden">
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-200 group-hover:bg-blue-500 transition-colors"></div>
+
+                                <div className="pl-2">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <span className="font-mono text-xs text-gray-400 font-bold">#{report._id?.slice(-6)}</span>
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusColor(report.status)} uppercase tracking-wide`}>
+                                            {report.status}
+                                        </span>
+                                        <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden border border-gray-200 ml-2 hidden sm:block">
+                                            <div
+                                                className={`h-full ${report.status?.toLowerCase().includes('resolved') ? 'bg-green-500' : report.status?.toLowerCase().includes('progress') ? 'bg-amber-500' : 'bg-blue-600'}`}
+                                                style={{ width: report.status?.toLowerCase().includes('resolved') ? '100%' : report.status?.toLowerCase().includes('progress') ? '70%' : '30%' }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-700 transition-colors">{report.title || report.category}</h3>
+                                    <p className="text-gray-500 text-sm flex flex-wrap items-center gap-3 mt-1">
+                                        <span className="flex items-center gap-1"><span>📍</span> {report.location}</span>
+                                        {report.targetDepartment && (
+                                            <span className="flex items-center gap-1 text-blue-600 font-bold opacity-70">
+                                                <span>🏢</span> {report.targetDepartment}
+                                            </span>
+                                        )}
+                                    </p>
+                                    {report.imageUrl && (
+                                        <div className="mt-3 rounded-lg overflow-hidden border border-gray-100 w-32 h-20">
+                                            <img src={report.imageUrl} className="w-full h-full object-cover" alt="Preview" />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-4 w-full md:w-auto mt-2 md:mt-0">
+                                    <span className="text-xs text-gray-400 font-medium">{new Date(report.createdAt).toLocaleDateString()}</span>
+                                    <Link to={`/track-report?id=${report._id}`} className="btn-secondary py-2 px-6 text-sm font-bold bg-gray-50 hover:bg-white border-gray-200 ml-auto md:ml-0">
+                                        View Details
+                                    </Link>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-20 bg-gray-100 rounded-2xl border-2 border-dashed border-gray-200">
+                            <p className="text-gray-500 font-medium">No reports filed yet. Start by reporting a civic issue.</p>
+                            <Link to="/report-issue" className="text-blue-700 font-bold hover:underline mt-2 inline-block">Report Now →</Link>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

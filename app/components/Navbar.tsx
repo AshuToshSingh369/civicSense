@@ -1,6 +1,19 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
+    const handleReportClick = (e: React.MouseEvent) => {
+        if (!user) {
+            e.preventDefault();
+            alert("Authentication Required: Please login to report a civic issue.");
+            navigate('/login');
+        }
+    };
+
     return (
         <>
             {/* 1. TOP BAR (Official Strip) */}
@@ -37,17 +50,28 @@ export default function Navbar() {
 
                     {/* Desktop Nav */}
                     <nav className="hidden md:flex items-center gap-8 font-medium text-sm text-gray-600">
-                        <Link to="/" className="text-blue-800 font-bold border-b-2 border-blue-800 pb-0.5">Home</Link>
-                        <Link to="/report-issue" className="hover:text-blue-800 transition-colors">Report Issue</Link>
+                        <Link to="/" className="hover:text-blue-800 transition-colors">Home</Link>
+                        <Link to="/report-issue" onClick={handleReportClick} className="hover:text-blue-800 transition-colors">Report Issue</Link>
                         <Link to="/track-report" className="hover:text-blue-800 transition-colors">Track Status</Link>
 
                         <div className="flex gap-3 ml-4">
-                            <Link to="/login" className="px-5 py-2.5 font-bold text-blue-800 border-2 border-blue-100 rounded-lg hover:border-blue-800 transition-all">
-                                Login
-                            </Link>
-                            <Link to="/signup" className="px-5 py-2.5 font-bold text-white bg-blue-800 rounded-lg shadow-[0_4px_0_rgb(30,58,138)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgb(30,58,138)] transition-all">
-                                Register
-                            </Link>
+                            {user ? (
+                                <Link
+                                    to={user.role === 'authority' || user.role === 'admin' ? "/authority-dashboard" : "/dashboard"}
+                                    className="px-5 py-2.5 font-bold text-white bg-blue-800 rounded-lg shadow-[0_4px_0_rgb(30,58,138)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgb(30,58,138)] transition-all flex items-center gap-2"
+                                >
+                                    <span>👤</span> Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="px-5 py-2.5 font-bold text-blue-800 border-2 border-blue-100 rounded-lg hover:border-blue-800 transition-all">
+                                        Login
+                                    </Link>
+                                    <Link to="/signup" className="px-5 py-2.5 font-bold text-white bg-blue-800 rounded-lg shadow-[0_4px_0_rgb(30,58,138)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgb(30,58,138)] transition-all">
+                                        Register
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </nav>
                 </div>

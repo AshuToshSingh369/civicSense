@@ -1,7 +1,9 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useState } from "react";
 import type { Route } from "./+types/home";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -11,6 +13,17 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleReportClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      setShowAuthModal(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-gray-900 leading-relaxed selection:bg-amber-200 selection:text-amber-900 bg-noise">
 
@@ -47,7 +60,11 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-4 items-center">
-                <Link to="/report-issue" className="btn-primary flex items-center gap-3 px-8 text-lg">
+                <Link
+                  to="/report-issue"
+                  onClick={handleReportClick}
+                  className="btn-primary flex items-center gap-3 px-8 text-lg"
+                >
                   <span>📷</span> Report an Issue
                 </Link>
                 <Link to="/track-report" className="px-8 py-3.5 font-bold text-gray-700 bg-white border-2 border-gray-200 rounded-lg hover:border-gray-400 transition-colors shadow-sm">
@@ -149,6 +166,47 @@ export default function Home() {
       </main>
 
       <Footer />
+
+      {/* Authentication Required Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-blue-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white max-w-md w-full rounded-3xl shadow-2xl overflow-hidden animate-zoom-in">
+            <div className="bg-blue-900 p-8 text-center relative">
+              <button
+                onClick={() => setShowAuthModal(false)}
+                className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl text-white">🔒</span>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Authentication Required</h3>
+              <p className="text-blue-100 text-sm">To ensure accountability and track your report, please sign in to your Citizen ID.</p>
+            </div>
+            <div className="p-8 space-y-4">
+              <Link
+                to="/login"
+                className="btn-primary w-full py-4 flex items-center justify-center gap-2"
+              >
+                <span>🔑</span> Secure Login
+              </Link>
+              <Link
+                to="/signup"
+                className="w-full py-4 border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50 transition-all flex items-center justify-center"
+              >
+                Create New Citizen ID
+              </Link>
+              <button
+                onClick={() => setShowAuthModal(false)}
+                className="w-full text-center text-gray-400 text-xs font-bold uppercase tracking-widest pt-2 hover:text-gray-600 transition-colors"
+              >
+                Continue as Guest (Read Only)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
