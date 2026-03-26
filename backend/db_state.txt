@@ -1,0 +1,9 @@
+--- Users ---
+Email: chairman@gmail.com, Role: authority, Dept: KTM-LAZ
+Email: boudha@gmail.com, Role: authority, Dept: KTM-BOU
+Email: ashu17027@gmail.com, Role: citizen, Dept: BRG-PAN
+Email: B_p@gmail.com, Role: authority, Dept: BRG-PAN
+
+--- Reports ---
+Total Reports in DB: 1
+Title: Pollution Report by Ashu Tosh, TargetDept: BRG-PAN, Location: Sitapaila, Nagarjun-04, Nagarjun, Nagarjun Municipality, Kathmandu, Bagamati Province, 44620, Nepal

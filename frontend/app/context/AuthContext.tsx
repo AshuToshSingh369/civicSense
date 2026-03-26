@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface User {
     _id: string;
     name: string;
     email: string;
     role: string;
-    token: string;
+    token?: string; // Optional legacy support
     homeDepartment?: string;
     departmentCode?: string;
 }
@@ -26,20 +26,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (e) {
+                console.error("Failed to parse stored user", e);
+                localStorage.removeItem('user');
+            }
         }
         setLoading(false);
     }, []);
 
-    const login = (userData: User) => {
+    const login = useCallback((userData: User) => {
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = useCallback(async () => {
+        try {
+            // Call backend to clear httpOnly cookie
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
         setUser(null);
         localStorage.removeItem('user');
-    };
+    }, []);
 
     return (
         <AuthContext.Provider value={{ user, login, logout, loading }}>

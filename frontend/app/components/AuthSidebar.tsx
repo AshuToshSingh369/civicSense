@@ -4,36 +4,67 @@ interface AuthSidebarProps {
     subtitle: string;
 }
 
-
-
 export default function AuthSidebar({ title1, title2, subtitle }: AuthSidebarProps) {
     return (
-        <div className="hidden lg:flex w-1/2 relative bg-blue-900 overflow-hidden">
-            <img
-                src="/auth-sidebar.png"
-                alt="Traditional Nepali Architecture"
-                className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay"
+        <div className="hidden lg:flex w-1/2 relative overflow-hidden">
+            {/* Nepali landscape photo */}
+            <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: "url('/nepal-sidebar.png')" }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-900 via-transparent to-blue-900/50"></div>
 
-            <div className="relative z-10 p-12 flex flex-col justify-between h-full text-white">
+            {/* Dark overlay gradient for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900/85 via-slate-900/60 to-blue-900/40" />
+
+            {/* Content */}
+            <div className="relative z-10 p-14 flex flex-col justify-between h-full text-white w-full">
+                {/* Top */}
                 <div>
-                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 mb-6">
-                        <span className="text-xl">🇳🇵</span>
-                        <span className="uppercase tracking-widest text-sm font-bold">Secure Portal</span>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
+                            <span className="material-symbols-outlined text-[18px]">radar</span>
+                        </div>
+                        <span className="text-lg font-bold tracking-tight">CivicSense</span>
                     </div>
-                    <h1 className="text-5xl font-bold leading-tight mb-4">
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 mt-4">
+                        <span className="size-2 rounded-full bg-green-400 animate-pulse" />
+                        <span className="uppercase tracking-widest text-xs font-semibold text-white/90">Government of Nepal</span>
+                    </div>
+                </div>
+
+                {/* Center */}
+                <div>
+                    <h1 className="text-4xl xl:text-5xl font-extrabold leading-tight mb-5 tracking-tight drop-shadow-lg">
                         {title1}<br />
                         <span className="text-blue-200">{title2}</span>
                     </h1>
-                    <p className="text-blue-100 text-lg max-w-md">
+                    <div className="w-16 h-1 bg-white/30 rounded-full mb-6" />
+                    <p className="text-white/80 text-base xl:text-lg max-w-sm leading-relaxed font-medium">
                         {subtitle}
                     </p>
+
+                    {/* Feature pills */}
+                    <div className="mt-8 flex flex-col gap-3">
+                        {[
+                            { icon: "shield", text: "Secure & encrypted access" },
+                            { icon: "location_on", text: "GPS-verified reporting" },
+                            { icon: "notifications_active", text: "Real-time status updates" },
+                        ].map(item => (
+                            <div key={item.icon} className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
+                                <span className="material-symbols-outlined text-blue-300 text-[18px]">{item.icon}</span>
+                                <span className="text-sm font-medium text-white/90">{item.text}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                <div className="flex gap-4 opacity-60 text-sm">
-                    <span>• Secure Encryption</span>
-                    <span>• Government Verified</span>
-                    <span>• 24/7 Support</span>
+
+                {/* Bottom */}
+                <div className="flex gap-6 text-[11px] font-semibold text-white/50 uppercase tracking-widest pt-8 border-t border-white/10">
+                    <span>Official Portal</span>
+                    <span>·</span>
+                    <span>Secure Access</span>
+                    <span>·</span>
+                    <span>Privacy Guaranteed</span>
                 </div>
             </div>
         </div>

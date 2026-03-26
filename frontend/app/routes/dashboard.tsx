@@ -17,12 +17,10 @@ export default function Dashboard() {
         }
 
         const fetchReports = async () => {
-            if (!user?.token) return;
+            if (!user) return;
             try {
                 const response = await fetch('/api/reports', {
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`
-                    }
+                    credentials: 'include'
                 });
                 const data = await response.json();
 
@@ -30,7 +28,7 @@ export default function Dashboard() {
                 if (user.role === 'citizen') {
                     // Logic would usually be on backend, but ensuring here
                 }
-                setReports(data);
+                setReports(Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []));
             } catch (error) {
                 console.error("Failed to fetch reports:", error);
             } finally {
@@ -73,43 +71,46 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-20 relative">
+        <div className="min-h-screen bg-background-muted font-sans text-text-main pb-20 relative selection:bg-primary selection:text-white">
+
+            
 
             {/* Real-time Notification for Citizen */}
             {socketAlert && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md animate-fade-in-down">
-                    <div className="mx-4 p-4 rounded-xl bg-blue-900 text-white shadow-2xl border border-blue-700 flex items-center gap-3">
-                        <span className="text-xl">🔔</span>
-                        <p className="text-sm font-bold">{socketAlert}</p>
+                    <div className="mx-4 p-4 rounded-xl bg-white text-text-main shadow-sm border border-border-muted flex items-center gap-3">
+                        <span className="material-symbols-outlined text-primary animate-pulse">notifications_active</span>
+                        <p className="text-sm font-bold tracking-wide">{socketAlert}</p>
                     </div>
                 </div>
             )}
 
             {/* Dashboard Header */}
-
-            <header className="bg-blue-900 text-white sticky top-0 z-50 shadow-md">
-                <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+            <header className="bg-white sticky top-0 z-50 border-b border-border-muted">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-3 group">
-                        <div className="w-12 h-12 bg-white text-blue-900 rounded-lg flex items-center justify-center shadow-lg font-bold text-xl group-hover:scale-105 transition-transform border border-blue-100">
-                            CS
+                        <div className="size-10 bg-background-muted text-primary rounded-lg flex items-center justify-center border border-border-muted group-hover:bg-primary group-hover:text-white transition-all">
+                            <span className="material-symbols-outlined text-xl">radar</span>
                         </div>
                         <div className="leading-tight">
-                            <span className="font-bold text-lg block group-hover:text-blue-100 transition-colors">Citizen Dashboard</span>
-                            <span className="text-[10px] text-blue-200 uppercase tracking-widest font-bold">A digital approach for better services</span>
+                            <span className="font-bold text-lg block text-[#003d7a] group-hover:text-primary transition-colors tracking-tight">My Dashboard</span>
+                            <span className="text-[10px] text-text-muted uppercase tracking-widest font-bold">Citizen</span>
                         </div>
                     </Link>
 
-
-
                     <div className="flex items-center gap-6">
-                        <span className="text-sm font-medium text-blue-100 hidden sm:block">Namaste, {user?.name || 'Guest'}</span>
+                        <span className="text-sm font-medium text-text-main hidden sm:flex items-center gap-2">
+                            <span className="size-2 rounded-full bg-green-500 animate-pulse"></span>
+                            {user?.name || 'Guest'}
+                        </span>
                         <button
                             onClick={() => {
                                 logout();
                                 navigate('/login');
                             }}
-                            className="text-sm text-white/80 hover:text-white font-bold hover:underline transition-colors"
+                            className="text-sm text-text-muted hover:text-text-main font-bold transition-colors flex items-center gap-2"
                         >
+                            <span className="material-symbols-outlined text-[18px]">logout</span>
                             Sign Out
                         </button>
                     </div>
@@ -117,109 +118,129 @@ export default function Dashboard() {
             </header>
 
             {/* Hero Profile Banner */}
-            <div className="relative h-64 bg-blue-900 overflow-hidden">
-                <img
-                    src="/hero-nepal.png"
-                    alt="City Background"
-                    className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-luminosity"
-                    style={{ objectPosition: 'center bottom' }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-blue-900/60"></div>
+            <div className="relative h-64 overflow-hidden border-b border-border-muted z-10 bg-white">
+                <div className="absolute inset-0 bg-primary/5"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-background-light to-transparent"></div>
 
-                <div className="container mx-auto px-4 h-full flex flex-col justify-end pb-8 relative z-10">
+                <div className="max-w-7xl mx-auto px-6 h-full flex flex-col justify-end pb-8 relative z-10">
                     <div className="flex items-end gap-6">
-                        <div className="w-24 h-24 bg-white rounded-full border-4 border-white shadow-xl overflow-hidden flex items-center justify-center text-4xl mb-[-12px]">
-                            👤
+                        <div className="size-24 bg-background-muted rounded-2xl border border-border-muted shadow-sm overflow-hidden flex items-center justify-center text-4xl mb-[-12px] relative group cursor-pointer">
+                            <div className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors"></div>
+                            <span className="material-symbols-outlined text-5xl text-primary relative z-10">person</span>
                         </div>
                         <div className="mb-2">
-                            <h1 className="text-3xl font-bold text-gray-900">{user?.name || 'Your'}'s Impact</h1>
-                            <p className="text-gray-600 font-medium">Citizen Role: {user?.role || 'Guest'}</p>
+                            <h1 className="text-3xl font-extrabold text-[#003d7a] tracking-tight flex items-center gap-3">
+                                {user?.name || 'Your'}'s Reports
+                                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold border border-primary/30 text-primary bg-primary/10">Active</span>
+                            </h1>
+                            <p className="text-text-muted text-sm mt-1 font-bold">Role: <span className="text-primary uppercase">{user?.role || 'Guest'}</span></p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <main className="container mx-auto px-4 pt-12">
+            <main className="max-w-7xl mx-auto px-6 pt-12 relative z-10">
                 {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-lg shadow-gray-200/50 hover:-translate-y-1 transition-transform">
-                        <span className="text-gray-400 text-xs font-bold uppercase block mb-2">Total Reports</span>
-                        <span className="text-4xl font-bold text-gray-900">{stats.total}</span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 relative z-10">
+                    <div className="card-gov hover:border-primary max-sm:p-4 transition-all group">
+                        <span className="text-text-muted text-xs font-bold uppercase tracking-widest block mb-2 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[14px]">data_usage</span> Total Reports
+                        </span>
+                        <span className="text-4xl font-extrabold text-[#003d7a]">{stats.total}</span>
                     </div>
-                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-lg shadow-gray-200/50 hover:-translate-y-1 transition-transform">
-                        <span className="text-green-600 text-xs font-bold uppercase block mb-2">Resolved</span>
-                        <span className="text-4xl font-bold text-green-600">{stats.resolved}</span>
+                    <div className="card-gov hover:border-green-500 max-sm:p-4 transition-all group">
+                        <span className="text-green-700 text-xs font-bold uppercase tracking-widest block mb-2 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[14px]">check_circle</span> Resolved
+                        </span>
+                        <span className="text-4xl font-extrabold text-green-600">{stats.resolved}</span>
                     </div>
-                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-lg shadow-gray-200/50 hover:-translate-y-1 transition-transform">
-                        <span className="text-amber-600 text-xs font-bold uppercase block mb-2">In Progress</span>
-                        <span className="text-4xl font-bold text-amber-600">{stats.inProgress}</span>
+                    <div className="card-gov hover:border-amber-500 max-sm:p-4 transition-all group">
+                        <span className="text-amber-700 text-xs font-bold uppercase tracking-widest block mb-2 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[14px]">sync</span> In Progress
+                        </span>
+                        <span className="text-4xl font-extrabold text-amber-600">{stats.inProgress}</span>
                     </div>
-                    <div className="bg-white p-6 rounded-xl border border-blue-100 shadow-lg shadow-blue-900/10 hover:-translate-y-1 transition-transform bg-gradient-to-br from-white to-blue-50">
-                        <span className="text-blue-600 text-xs font-bold uppercase block mb-2">Impact Score</span>
-                        <span className="text-4xl font-bold text-blue-700">{stats.resolved * 100 + stats.inProgress * 20}</span>
+                    <div className="card-gov hover:border-primary max-sm:p-4 transition-all group relative overflow-hidden">
+                        <div className="hidden transition-colors"></div>
+                        <span className="text-primary text-xs font-bold uppercase tracking-widest block mb-2 flex items-center gap-2 relative z-10">
+                            <span className="material-symbols-outlined text-[14px]">military_tech</span> Impact Score
+                        </span>
+                        <span className="text-4xl font-extrabold text-primary relative z-10">{stats.resolved * 100 + stats.inProgress * 20}</span>
                     </div>
                 </div>
 
                 {/* Action Bar */}
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 border-b border-gray-200 pb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
-                    <Link to="/report-issue" className="btn-primary flex items-center gap-2 shadow-xl shadow-blue-900/20 text-sm py-3 px-8 transform hover:scale-105 transition-all">
-                        <span>📷</span> New Report
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 border-b border-border-muted pb-6 relative z-10">
+                    <h2 className="text-2xl font-extrabold text-[#003d7a] tracking-tight flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary">history</span>
+                        My Reports
+                    </h2>
+                    <Link to="/report-issue" className="btn-gov-primary flex items-center gap-2 text-sm py-3 px-8 group">
+                        <span className="material-symbols-outlined group-hover:animate-pulse">add_circle</span> New Report
                     </Link>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 relative z-10">
                     {loading ? (
                         <div className="text-center py-20 grayscale opacity-50">
-                            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                            <p className="font-bold text-gray-400">Loading your reports...</p>
+                            <div className="size-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <p className="font-mono text-sm text-primary uppercase tracking-widest font-bold animate-pulse">Loading reports...</p>
                         </div>
                     ) : reports.length > 0 ? (
                         reports.map((report) => (
-                            <div key={report._id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-blue-300 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group cursor-pointer relative overflow-hidden">
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-200 group-hover:bg-blue-500 transition-colors"></div>
+                            <div key={report._id} className="card-gov hover:border-primary px-6 py-4 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group cursor-pointer relative overflow-hidden">
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-border-muted group-hover:bg-primary transition-colors"></div>
 
-                                <div className="pl-2">
+                                <div className="pl-3">
                                     <div className="flex items-center gap-3 mb-2">
-                                        <span className="font-mono text-xs text-gray-400 font-bold">#{report._id?.slice(-6)}</span>
-                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusColor(report.status)} uppercase tracking-wide`}>
+                                        <span className="text-[10px] text-primary font-bold bg-background-muted px-2 py-0.5 rounded border border-border-muted tracking-widest uppercase">#{report._id?.slice(-6)}</span>
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusColor(report.status)} uppercase tracking-widest font-mono`}>
                                             {report.status}
                                         </span>
-                                        <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden border border-gray-200 ml-2 hidden sm:block">
+                                        <div className="w-24 h-1.5 bg-border-muted rounded-full overflow-hidden ml-2 hidden sm:block">
                                             <div
-                                                className={`h-full ${report.status?.toLowerCase().includes('resolved') ? 'bg-green-500' : report.status?.toLowerCase().includes('progress') ? 'bg-amber-500' : 'bg-blue-600'}`}
+                                                className={`h-full ${report.status?.toLowerCase().includes('resolved') ? 'bg-green-500 shadow-[0_0_5px_#22c55e80]' : report.status?.toLowerCase().includes('progress') ? 'bg-amber-500 shadow-[0_0_5px_#fbbf2480]' : 'bg-primary shadow-[0_0_5px_#0d93f280]'}`}
                                                 style={{ width: report.status?.toLowerCase().includes('resolved') ? '100%' : report.status?.toLowerCase().includes('progress') ? '70%' : '30%' }}
                                             ></div>
                                         </div>
                                     </div>
-                                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-700 transition-colors">{report.title || report.category}</h3>
-                                    <p className="text-gray-500 text-sm flex flex-wrap items-center gap-3 mt-1">
-                                        <span className="flex items-center gap-1"><span>📍</span> {report.location}</span>
+                                    <h3 className="font-bold text-lg text-[#003d7a] group-hover:text-primary transition-colors tracking-tight">{report.title || report.category}</h3>
+                                    <p className="text-text-muted text-sm font-bold flex flex-wrap items-center gap-3 mt-2">
+                                        <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px] text-primary">location_on</span> {report.location}</span>
                                         {report.targetDepartment && (
-                                            <span className="flex items-center gap-1 text-blue-600 font-bold opacity-70">
-                                                <span>🏢</span> {report.targetDepartment}
+                                            <span className="flex items-center gap-1 text-primary/80 font-mono text-xs border border-primary/20 px-2 py-0.5 rounded bg-primary/5">
+                                                <span className="material-symbols-outlined text-[14px]">domain</span> {report.targetDepartment}
                                             </span>
                                         )}
                                     </p>
                                     {report.imageUrl && (
-                                        <div className="mt-3 rounded-lg overflow-hidden border border-gray-100 w-32 h-20">
+                                        <div className="mt-4 rounded-lg overflow-hidden border border-border-muted w-32 h-20 opacity-90 group-hover:opacity-100 transition-opacity">
                                             <img src={report.imageUrl} className="w-full h-full object-cover" alt="Preview" />
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="flex items-center gap-4 w-full md:w-auto mt-2 md:mt-0">
-                                    <span className="text-xs text-gray-400 font-medium">{new Date(report.createdAt).toLocaleDateString()}</span>
-                                    <Link to={`/track-report?id=${report._id}`} className="btn-secondary py-2 px-6 text-sm font-bold bg-gray-50 hover:bg-white border-gray-200 ml-auto md:ml-0">
-                                        View Details
+                                <div className="flex items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
+                                    <span className="text-[10px] text-text-muted font-bold uppercase tracking-widest flex items-center gap-1">
+                                        <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                                        {new Date(report.createdAt).toLocaleDateString()}
+                                    </span>
+                                    <Link to={`/track-report?id=${report._id}`} className="btn-gov-secondary py-2 px-6 text-sm font-bold ml-auto md:ml-0 flex items-center gap-2">
+                                        View Details <span className="material-symbols-outlined text-[18px]">open_in_new</span>
                                     </Link>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <div className="text-center py-20 bg-gray-100 rounded-2xl border-2 border-dashed border-gray-200">
-                            <p className="text-gray-500 font-medium">No reports filed yet. Start by reporting a civic issue.</p>
-                            <Link to="/report-issue" className="text-blue-700 font-bold hover:underline mt-2 inline-block">Report Now →</Link>
+                        <div className="text-center py-20 bg-white rounded-lg border-2 border-border-muted border-dashed relative overflow-hidden">
+                            <div className=" pointer-events-none"></div>
+                            <div className="size-16 bg-background-muted rounded-full flex items-center justify-center mx-auto mb-4 border border-border-muted">
+                                <span className="material-symbols-outlined text-3xl text-primary">inbox</span>
+                            </div>
+                            <p className="text-text-muted font-bold uppercase tracking-widest text-xs">No reports yet.</p>
+                            <Link to="/report-issue" className="text-primary font-bold hover:underline mt-4 inline-flex items-center gap-2">
+                                File your first report <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                            </Link>
                         </div>
                     )}
                 </div>

@@ -1,107 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Link, useNavigate } from "react-router";
-import { motion } from "framer-motion";
 import type { Route } from "./+types/signup";
 import AuthSidebar from "../components/AuthSidebar";
 import { useAuth } from "../context/AuthContext";
+import { JURISDICTIONS_DATA } from "../utils/jurisdictions";
 
 export function meta({ }: Route.MetaArgs) {
     return [
-        { title: "Register - CivicSense Nepal" },
+        { title: "Create Account - CivicSense Nepal" },
         { name: "description", content: "Create a new CivicSense account" },
     ];
 }
 
-const JURISDICTIONS_DATA = {
-    "Kathmandu": [
-        { label: "Ward 1 - Central", value: "KTM-W01" },
-        { label: "Ward 2 - Thamel", value: "KTM-W02" },
-        { label: "Ward 3 - Maharajgunj", value: "KTM-W03" }
-    ],
-    "Pokhara": [
-        { label: "Ward 5 - Lakeside", value: "PKR-W05" },
-        { label: "Ward 6 - Baidam", value: "PKR-W06" }
-    ],
-    "Lalitpur": [
-        { label: "Ward 3 - Pulchowk", value: "LAL-W03" },
-        { label: "Ward 4 - Jhamsikhel", value: "LAL-W04" }
-    ]
-};
-
-
 export default function Signup() {
     const navigate = useNavigate();
-    const [role, setRole] = useState<"citizen" | "authority">("citizen");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { login: authLogin } = useAuth();
+    const [showPassword, setShowPassword] = useState(false);
+    const { login: authLogin, user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            navigate(user.role === "authority" || user.role === "admin" ? "/authority-dashboard" : "/dashboard");
+        }
+    }, [user, navigate]);
 
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        deptCode: "",
-        homeDepartment: "",
-        tempCity: "",
-        password: "",
-        confirmPassword: ""
+        firstName: "", lastName: "", email: "",
+        homeDepartment: "", tempCity: "", password: "", confirmPassword: ""
     });
-
     const [errors, setErrors] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        deptCode: "",
-        password: "",
-        confirmPassword: ""
+        firstName: "", lastName: "", email: "", password: "", confirmPassword: ""
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name as keyof typeof errors]) {
-            setErrors(prev => ({ ...prev, [name]: "" }));
-        }
-
-        // Reset ward if city changes
-        if (name === "tempCity") {
-            setFormData(prev => ({ ...prev, homeDepartment: "" }));
-        }
+        if (errors[name as keyof typeof errors]) setErrors(prev => ({ ...prev, [name]: "" }));
+        if (name === "tempCity") setFormData(prev => ({ ...prev, [name]: value, homeDepartment: "" }));
     };
 
     const validate = () => {
         let isValid = true;
-        const newErrors = { firstName: "", lastName: "", email: "", deptCode: "", password: "", confirmPassword: "" };
+        const newErrors = { firstName: "", lastName: "", email: "", password: "", confirmPassword: "" };
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const mobileRegex = /^[9][0-9]{9}$/;
 
         if (!formData.firstName.trim()) { newErrors.firstName = "First Name is required"; isValid = false; }
         if (!formData.lastName.trim()) { newErrors.lastName = "Last Name is required"; isValid = false; }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const mobileRegex = /^[9][0-9]{9}$/;
-        if (!formData.email) {
-            newErrors.email = "Email/Mobile is required";
-            isValid = false;
-        } else if (!emailRegex.test(formData.email) && !mobileRegex.test(formData.email)) {
-            newErrors.email = "Invalid Format";
-            isValid = false;
-        }
-
-        if (role === "authority" && !formData.deptCode.trim()) {
-            newErrors.deptCode = "Dept Code is required";
-            isValid = false;
-        }
-
-        if (!formData.password) {
-            newErrors.password = "Password is required";
-            isValid = false;
-        } else if (formData.password.length < 6) {
-            newErrors.password = "Min 6 chars required";
-            isValid = false;
-        }
-
-        if (formData.confirmPassword !== formData.password) {
-            newErrors.confirmPassword = "Passwords do not match";
-            isValid = false;
-        }
+        if (!formData.email) { newErrors.email = "Email/Mobile is required"; isValid = false; }
+        else if (!emailRegex.test(formData.email) && !mobileRegex.test(formData.email)) { newErrors.email = "Invalid format"; isValid = false; }
+        if (!formData.password) { newErrors.password = "Password is required"; isValid = false; }
+        else if (formData.password.length < 6) { newErrors.password = "Min 6 characters required"; isValid = false; }
+        if (formData.confirmPassword !== formData.password) { newErrors.confirmPassword = "Passwords do not match"; isValid = false; }
 
         setErrors(newErrors);
         return isValid;
@@ -110,7 +60,6 @@ export default function Signup() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validate()) return;
-
         setIsSubmitting(true);
         try {
             const response = await fetch('/api/auth/register', {
@@ -118,191 +67,151 @@ export default function Signup() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: `${formData.firstName} ${formData.lastName}`,
-                    email: formData.email,
-                    password: formData.password,
-                    role: role,
-                    departmentCode: formData.deptCode,
-                    homeDepartment: formData.homeDepartment
+                    email: formData.email, password: formData.password,
+                    homeDepartment: formData.homeDepartment, tempCity: formData.tempCity
                 })
             });
-
             const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Signup failed');
-            }
-
-            // Redirect to OTP Verification
+            if (!response.ok) throw new Error(data.message || 'Signup failed');
             navigate(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
         } catch (error: any) {
-
-            console.error(error);
             alert(error.message || "Failed to register. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    return (
-        <div className="min-h-screen flex bg-gray-50 font-sans text-gray-900">
+    const inputCls = (hasError: boolean) =>
+        `w-full border rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all text-sm ${hasError ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'}`;
+    const labelCls = "block text-sm font-semibold text-slate-700 mb-1.5";
 
-            {/* Reusable Sidebar */}
+    return (
+        <div className="min-h-screen flex bg-background-light font-sans text-slate-900 selection:bg-primary selection:text-white">
             <AuthSidebar
-                title1="Your Voice,"
-                title2="Your Community."
-                subtitle="Create an account to report issues, track progress, and help your Ward Office work efficiently."
+                title1="Join the"
+                title2="CivicSense Community"
+                subtitle="Create your account to start reporting issues in your local community and track their resolution progress."
             />
 
-            {/* Right Panel - Form (Blue Theme) */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 relative">
-                <div className="absolute inset-0 bg-[url('/bg-pattern.png')] opacity-40 pointer-events-none"></div>
-
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 relative z-10"
-                >
+            {/* Right panel */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:px-16 lg:py-10 bg-white overflow-y-auto">
+                <div className="w-full max-w-md">
+                    {/* Logo */}
                     <div className="mb-8 text-center">
-                        <Link to="/" className="inline-flex items-center gap-3 mb-6 group">
-                            <div className="w-10 h-10 bg-blue-700 text-white rounded-lg flex items-center justify-center font-bold shadow-lg shadow-blue-900/10 group-hover:scale-110 transition-transform">
-                                CS
+                        <Link to="/" className="inline-flex items-center gap-2 mb-6 group">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white group-hover:bg-primary-dark transition-colors">
+                                <span className="material-symbols-outlined text-[20px]">radar</span>
                             </div>
-                            <div className="text-left">
-                                <span className="block font-bold text-gray-900 group-hover:text-blue-700 transition-colors leading-none">CivicSense</span>
-                                <span className="text-[8px] uppercase text-blue-600 font-bold tracking-tighter">Digital Services</span>
-                            </div>
+                            <span className="font-bold text-xl text-slate-900">CivicSense</span>
                         </Link>
-
-
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-                        <p className="text-gray-500">Join the Digital Nepal initiative.</p>
+                        <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Create your account</h1>
+                        <p className="text-slate-500 text-sm">Join thousands of citizens making Nepal better</p>
                     </div>
 
-                    <div className="flex bg-gray-100 p-1 rounded-lg mb-8">
-                        <button type="button" onClick={() => setRole("citizen")} className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${role === "citizen" ? "bg-white text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>Citizen</button>
-                        <button type="button" onClick={() => setRole("authority")} className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${role === "authority" ? "bg-white text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>Authority</button>
-                    </div>
-
-                    <Form onSubmit={handleSubmit} className="space-y-5" noValidate>
-                        <div className="grid grid-cols-2 gap-4">
+                    <Form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                        {/* Name row */}
+                        <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">First Name</label>
-                                <input name="firstName" type="text" className={`input-gov ${errors.firstName ? 'border-red-500' : ''}`} placeholder="Ram" value={formData.firstName} onChange={handleChange} />
-                                {errors.firstName && <span className="text-red-500 text-xs">{errors.firstName}</span>}
+                                <label className={labelCls}>First Name</label>
+                                <input name="firstName" type="text" className={inputCls(!!errors.firstName)} placeholder="Ram" value={formData.firstName} onChange={handleChange} />
+                                {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Last Name</label>
-                                <input name="lastName" type="text" className={`input-gov ${errors.lastName ? 'border-red-500' : ''}`} placeholder="Sharma" value={formData.lastName} onChange={handleChange} />
-                                {errors.lastName && <span className="text-red-500 text-xs">{errors.lastName}</span>}
+                                <label className={labelCls}>Last Name</label>
+                                <input name="lastName" type="text" className={inputCls(!!errors.lastName)} placeholder="Sharma" value={formData.lastName} onChange={handleChange} />
+                                {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                             </div>
                         </div>
 
+                        {/* Email */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Email / Mobile</label>
-                            <input name="email" type="text" className={`input-gov ${errors.email ? 'border-red-500' : ''}`} placeholder="ram@example.com" value={formData.email} onChange={handleChange} />
-                            {errors.email && <span className="text-red-500 text-xs">{errors.email}</span>}
+                            <label className={labelCls}>Email or Mobile Number</label>
+                            <input name="email" type="text" className={inputCls(!!errors.email)} placeholder="name@example.com" value={formData.email} onChange={handleChange} />
+                            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                         </div>
 
-                        {role === "citizen" && (
-                            <div className="space-y-4">
+                        {/* Municipality */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className={labelCls}>Municipality</label>
+                                <select name="tempCity" className="w-full border border-slate-200 rounded-lg px-3 py-3 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all appearance-none bg-white" onChange={handleChange} value={formData.tempCity}>
+                                    <option value="">Select city</option>
+                                    {Object.keys(JURISDICTIONS_DATA).map(city => (
+                                        <option key={city} value={city}>{city}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {formData.tempCity && (
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">City</label>
-                                    <select
-                                        name="tempCity"
-                                        className="input-gov"
-                                        onChange={handleChange}
-                                        value={formData.tempCity} // Bind value
-                                    >
-                                        <option value="">Select City</option>
-                                        {Object.keys(JURISDICTIONS_DATA).map(city => (
-                                            <option key={city} value={city}>{city}</option>
+                                    <label className={labelCls}>Ward / Unit</label>
+                                    <select name="homeDepartment" className="w-full border border-slate-200 rounded-lg px-3 py-3 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all appearance-none bg-white" value={formData.homeDepartment} onChange={handleChange}>
+                                        <option value="">Select ward</option>
+                                        {JURISDICTIONS_DATA[formData.tempCity as keyof typeof JURISDICTIONS_DATA].map((subCity: any) => (
+                                            <option key={subCity.value} value={subCity.value}>{subCity.label}</option>
                                         ))}
                                     </select>
                                 </div>
-                                {formData.tempCity && ( // Use formData.tempCity directly
-                                    <div className="animate-fade-in-down">
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">Ward Number</label>
-                                        <select
-                                            name="homeDepartment"
-                                            className="input-gov"
-                                            value={formData.homeDepartment}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="">Select Ward</option>
-                                            {JURISDICTIONS_DATA[formData.tempCity as keyof typeof JURISDICTIONS_DATA].map((ward: any) => ( // Use formData.tempCity directly
-                                                <option key={ward.value} value={ward.value}>{ward.label}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {role === "authority" && (
-                            <div className="space-y-5">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">City</label>
-                                    <select
-                                        name="tempCity"
-                                        className="input-gov"
-                                        onChange={handleChange}
-                                        value={formData.tempCity} // Bind value
-                                    >
-                                        <option value="">Select City</option>
-                                        {Object.keys(JURISDICTIONS_DATA).map(city => (
-                                            <option key={city} value={city}>{city}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                {formData.tempCity && (
-                                    <div className="animate-fade-in-down">
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">Primary Jurisdiction</label>
-                                        <select
-                                            name="deptCode"
-                                            className="input-gov"
-                                            value={formData.deptCode}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="">Select Ward</option>
-                                            {JURISDICTIONS_DATA[formData.tempCity as keyof typeof JURISDICTIONS_DATA].map((ward: any) => (
-                                                <option key={ward.value} value={ward.value}>{ward.label}</option>
-                                            ))}
-                                        </select>
-                                        <p className="text-[10px] text-gray-400 mt-1">This sets your official municipal oversight area.</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Create Password</label>
-                            <input name="password" type="password" className={`input-gov ${errors.password ? 'border-red-500' : ''}`} placeholder="••••••••" value={formData.password} onChange={handleChange} />
-                            {errors.password && <span className="text-red-500 text-xs">{errors.password}</span>}
+                            )}
                         </div>
 
+                        {/* Password */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Confirm Password</label>
-                            <input name="confirmPassword" type="password" className={`input-gov ${errors.confirmPassword ? 'border-red-500' : ''}`} placeholder="••••••••" value={formData.confirmPassword} onChange={handleChange} />
-                            {errors.confirmPassword && <span className="text-red-500 text-xs">{errors.confirmPassword}</span>}
+                            <label className={labelCls}>Password</label>
+                            <div className="relative">
+                                <input name="password" type={showPassword ? "text" : "password"} className={inputCls(!!errors.password) + " pr-11"} placeholder="••••••••" value={formData.password} onChange={handleChange} />
+                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                    <span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                                </button>
+                            </div>
+                            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div>
+                            <label className={labelCls}>Confirm Password</label>
+                            <input name="confirmPassword" type="password" className={inputCls(!!errors.confirmPassword)} placeholder="••••••••" value={formData.confirmPassword} onChange={handleChange} />
+                            {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                         </div>
 
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className={`w-full btn-primary py-4 shadow-lg shadow-blue-900/10 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`w-full flex items-center justify-center gap-2 bg-primary text-white rounded-lg py-3.5 text-sm font-bold shadow-sm transition-all hover:-translate-y-0.5 hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mt-2 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
-                            {isSubmitting ? 'Processing...' : 'Verify & Register'}
+                            {isSubmitting
+                                ? <><span className="animate-spin material-symbols-outlined text-[18px]">sync</span> Creating account...</>
+                                : <><span className="material-symbols-outlined text-[18px]">person_add</span> Create Account</>
+                            }
                         </button>
                     </Form>
 
-                    <div className="mt-8 text-center text-sm text-gray-500">
-                        Already have an account?{' '}
-                        <Link to="/login" className="text-blue-700 font-bold hover:underline">
-                            Log in
-                        </Link>
+                    {/* Divider */}
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                        <div className="relative flex justify-center text-xs text-slate-400 font-medium">
+                            <span className="px-4 bg-white">or continue with</span>
+                        </div>
                     </div>
-                </motion.div>
+
+                    {/* Google */}
+                    <a
+                        href="http://localhost:5000/api/auth/google"
+                        className="w-full flex items-center justify-center gap-3 border border-slate-200 text-slate-700 py-3 rounded-lg font-semibold text-sm shadow-sm hover:bg-slate-50 transition-all"
+                    >
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        Continue with Google
+                    </a>
+
+                    <p className="mt-6 text-center text-sm text-slate-500">
+                        Already have an account?{' '}
+                        <Link to="/login" className="text-primary hover:underline font-semibold">Sign in</Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

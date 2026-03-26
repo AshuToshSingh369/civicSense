@@ -9,6 +9,8 @@ export default [
     route("privacy-policy", "routes/privacy-policy.tsx"),
     route("terms-of-service", "routes/terms-of-service.tsx"),
     route("accessibility", "routes/accessibility.tsx"),
+    route("auth/success", "routes/auth.success.tsx"),
+    route("auth/complete-profile", "routes/auth.complete-profile.tsx"),
 
     // Protected Routes
 
