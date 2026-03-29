@@ -1,16 +1,16 @@
 import re
 
-# ─── Fix report-issue step labels and dark remnants ──────────────────────────
+
 report = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\report-issue.tsx"
 with open(report, "r", encoding="utf-8") as f:
     c = f.read()
 
-# Fix progress step labels
+
 c = c.replace(">Coordinates<", ">Location<")
 c = c.replace(">Visuals<", ">Photo<")
 c = c.replace(">Data<", ">Details<")
 
-# Fix dark remnants
+
 c = c.replace("bg-gradient-to-t from-background-dark/80 to-transparent", "bg-gradient-to-t from-black/20 to-transparent")
 c = c.replace("shadow-[0_0_20px_#00000080]", "shadow-sm")
 c = c.replace("font-bold text-white text-lg block tracking-tight group-hover:text-primary transition-colors font-extrabold",
@@ -22,18 +22,18 @@ with open(report, "w", encoding="utf-8") as f:
 print("report-issue.tsx step labels ✓")
 
 
-# ─── Fix track-report dark remnants ──────────────────────────────────────────
+
 track = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\track-report.tsx"
 with open(track, "r", encoding="utf-8") as f:
     c = f.read()
 
-# Fix dark main container
+
 c = c.replace(
     'className="min-h-screen bg-background-light dark:bg-background-muted font-display text-slate-900 dark:text-text-main flex flex-col md:flex-row relative selection:bg-primary selection:text-white overflow-hidden"',
     'className="min-h-screen bg-background-muted font-sans text-text-main flex flex-col md:flex-row relative selection:bg-primary selection:text-white overflow-hidden"'
 )
 
-# Remove animated blobs
+
 c = c.replace(
     '''{/* Background Animated Elements */}
             <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-none">
@@ -43,51 +43,51 @@ c = c.replace(
             </div>''', ''
 )
 
-# Fix header text (back button text color)
+
 c = c.replace("flex items-center gap-2 text-white font-bold text-xl uppercase tracking-wider hover:text-primary transition-colors group",
               "flex items-center gap-2 text-text-main font-bold text-xl hover:text-primary transition-colors group")
 
-# Fix search section title
+
 c = c.replace('text-3xl font-bold text-white mb-2 tracking-tight', 'text-3xl font-extrabold text-[#003d7a] mb-2 tracking-tight')
 
-# Fix report card title
+
 c = c.replace('<h2 className="text-3xl font-bold text-white leading-tight tracking-tight">',
               '<h2 className="text-3xl font-extrabold text-[#003d7a] leading-tight tracking-tight">')
 
-# Fix dark ref badge
+
 c = c.replace('bg-[#111518] px-2 py-1 rounded border border-border-muted',
               'bg-background-muted px-2 py-1 rounded border border-border-muted')
 
-# Fix "back / new query" button hover color
+
 c = c.replace('hover:text-white transition-colors flex items-center gap-1 font-mono',
               'hover:text-[#003d7a] transition-colors flex items-center gap-1')
 
-# Fix timeline circle dark bg
+
 c = c.replace("'bg-[#111518] border-border-muted text-text-muted'",
               "'bg-white border-border-muted text-text-muted'")
 
-# Fix timeline completed title
+
 c = c.replace("event.completed ? 'text-white' : 'text-text-muted'",
               "event.completed ? 'text-[#003d7a]' : 'text-text-muted'")
 
-# Fix timeline description text (both legs same)
+
 c = c.replace("transition-colors ${event.completed ? 'text-text-muted' : 'text-text-muted'}",
               "transition-colors text-text-muted")
 
-# Fix "Visual Evidence" badge dark bg
+
 c = c.replace("bg-white/90 backdrop-blur text-[10px] text-white font-mono px-2 py-1 rounded border border-border-muted uppercase",
               "bg-white text-[10px] text-text-muted font-bold px-2 py-1 rounded border border-border-muted uppercase tracking-wider")
 
-# Fix progress bar dark shadow colors -> clean ones
+
 c = c.replace("bg-green-500 shadow-[0_0_10px_#22c55ecc]", "bg-green-500")
 c = c.replace("bg-amber-500 shadow-[0_0_10px_#fbbf24cc]", "bg-amber-500")
 c = c.replace("bg-primary shadow-[0_0_10px_#0d93f2cc]", "bg-primary")
 
-# Fix timeline header
+
 c = c.replace('font-bold text-white mb-8 flex items-center gap-2 tracking-tight',
               'font-extrabold text-[#003d7a] mb-8 flex items-center gap-2 tracking-tight')
 
-# Fix right panel overlay
+
 c = c.replace("absolute inset-0 bg-primary/20 z-10 mix-blend-overlay pointer-events-none",
               "absolute inset-0 bg-primary/5 z-10 pointer-events-none")
 c = c.replace("absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent z-10",
@@ -104,7 +104,7 @@ with open(track, "w", encoding="utf-8") as f:
 print("track-report.tsx ✓")
 
 
-# ─── Fix authority dashboard dark remnants ────────────────────────────────────
+
 auth = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\authority-dashboard.tsx"
 with open(auth, "r", encoding="utf-8") as f:
     c = f.read()
@@ -118,7 +118,7 @@ with open(auth, "w", encoding="utf-8") as f:
 print("authority-dashboard.tsx dark remnants ✓")
 
 
-# ─── Fix dashboard dark remnants ─────────────────────────────────────────────
+
 dash = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\dashboard.tsx"
 with open(dash, "r", encoding="utf-8") as f:
     c = f.read()

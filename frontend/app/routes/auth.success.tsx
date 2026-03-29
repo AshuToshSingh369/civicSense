@@ -16,14 +16,14 @@ export default function AuthSuccess() {
         if (dataParam) {
             try {
                 hasProcessed.current = true;
-                // Decode the base64 payload
+                
                 const decodedStr = atob(dataParam);
                 const userData = JSON.parse(decodedStr);
 
-                // Update auth context
+                
                 login(userData);
 
-                // Small delay to ensure state update propagates, though login is synchronous with localStorage
+                
                 const needsProfileCompletion = !userData.homeDepartment || !userData.departmentCode;
                 const isAuthority = userData.role === 'authority' || userData.role === 'admin';
 
@@ -44,7 +44,7 @@ export default function AuthSuccess() {
     }, [searchParams, navigate, login]);
 
 
-    // Show a loading state while processing
+    
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center animate-pulse">

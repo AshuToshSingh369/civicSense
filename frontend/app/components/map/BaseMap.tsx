@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-// Fix for default Leaflet icons in Vite
+
 const fixLeafletIcons = async (L: any) => {
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
@@ -19,7 +19,7 @@ interface BaseMapProps {
 
 export default function BaseMap({
     children,
-    center = [28.3949, 84.1240], // Default center on Nepal
+    center = [28.3949, 84.1240], 
     zoom = 7,
     className = "w-full h-[400px] rounded-lg shadow-sm border border-gray-200 z-0",
     onMapLoad
@@ -29,7 +29,7 @@ export default function BaseMap({
 
     useEffect(() => {
         setIsClient(true);
-        // Dynamic import to prevent SSR crashes
+        
         const loadLeaflet = async () => {
             try {
                 const [L, ReactLeaflet] = await Promise.all([

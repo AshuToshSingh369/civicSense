@@ -5,9 +5,10 @@ interface User {
     name: string;
     email: string;
     role: string;
-    token?: string; // Optional legacy support
+    token?: string; 
     homeDepartment?: string;
     departmentCode?: string;
+    profilePhoto?: string;
 }
 
 interface AuthContextType {
@@ -27,7 +28,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             try {
-                setUser(JSON.parse(storedUser));
+                const parsed = JSON.parse(storedUser);
+                setUser(parsed);
+
+                fetch('/api/reports', { credentials: 'include' })
+                    .then(res => {
+                        if (res.status === 401) {
+                            console.warn('Session expired, clearing stored user.');
+                            setUser(null);
+                            localStorage.removeItem('user');
+                        }
+                    })
+                    .catch(() => {});
             } catch (e) {
                 console.error("Failed to parse stored user", e);
                 localStorage.removeItem('user');
@@ -43,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = useCallback(async () => {
         try {
-            // Call backend to clear httpOnly cookie
+            
             await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
         } catch (error) {
             console.error('Logout failed', error);

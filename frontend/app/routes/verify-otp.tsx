@@ -50,10 +50,10 @@ export default function VerifyOtp() {
                 subtitle="To ensure the integrity of our civic reporting network, we require a one-time verification code sent to your email."
             />
 
-            {/* Right Panel */}
+            
             <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white">
                 <div className="w-full max-w-md">
-                    {/* Logo */}
+                    
                     <div className="mb-10 text-center">
                         <Link to="/" className="inline-flex items-center gap-2 mb-8 group">
                             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white group-hover:bg-primary-dark transition-colors">

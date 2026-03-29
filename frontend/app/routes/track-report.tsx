@@ -20,7 +20,7 @@ export default function TrackReport() {
     const fetchReport = async (id: string) => {
         setLoading(true);
         setError("");
-        setReport(null); // Clear previous data
+        setReport(null); 
 
         try {
             const response = await fetch(`/api/reports/${id}?t=${Date.now()}`, {
@@ -33,11 +33,11 @@ export default function TrackReport() {
             }
 
             const s = data.status?.trim().toLowerCase() || 'pending';
-            console.log(`Report ${id} status: ${s}`); // Debugging sync
+            console.log(`Report ${id} status: ${s}`); 
 
             const reportWithTimeline = {
                 ...data,
-                status: s, // Ensure status is clean
+                status: s, 
                 timeline: [
                     { status: "Report Received", date: new Date(data.createdAt).toLocaleString(), completed: true, desc: "Successfully logged in the municipal database." },
                     { status: "Verified by Authority", date: s !== 'pending' ? 'Verified' : 'Pending', completed: s !== 'pending', desc: s !== 'pending' ? "Official has confirmed the issue and assigned a priority." : "Awaiting review by Ward Commissioner." },
@@ -76,9 +76,9 @@ export default function TrackReport() {
 
             
 
-            {/* Left Panel - Search & Result */}
+            
             <div className="w-full md:w-1/2 lg:w-5/12 mx-auto flex flex-col min-h-screen bg-white border border-border-muted shadow-sm shadow-md z-10 relative border-r border-border-muted backdrop-blur-xl">
-                {/* Header */}
+                
                 <header className="bg-white/90 p-6 flex items-center justify-between border-b border-border-muted">
                     <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-text-main font-bold text-xl hover:text-primary transition-colors group">
                         <span className="group-hover:-translate-x-1 transition-transform material-symbols-outlined">arrow_back</span>
@@ -142,7 +142,7 @@ export default function TrackReport() {
 
                     {report && (
                         <div className="animate-fade-in space-y-8 relative z-10">
-                            {/* Summary Card */}
+                            
                             <div className="bg-white border border-border-muted shadow-sm border-primary/20 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl p-8 shadow-sm relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
                                 <div className="flex justify-between items-start mb-6 relative z-10">
@@ -207,7 +207,7 @@ export default function TrackReport() {
                                 </div>
                             </div>
 
-                            {/* Timeline Log */}
+                            
                             <div className="bg-white border border-border-muted shadow-sm rounded-2xl p-8 border-border-muted relative z-10">
                                 <h3 className="font-extrabold text-[#003d7a] mb-8 flex items-center gap-2 tracking-tight">
                                     <span className="material-symbols-outlined text-primary">format_list_bulleted</span>
@@ -246,7 +246,7 @@ export default function TrackReport() {
                 </footer>
             </div>
 
-            {/* Right Panel - Map Visualization */}
+            
             <div className="hidden md:block w-1/2 lg:w-7/12 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-primary/5 z-10 pointer-events-none"></div>
                 <img
@@ -255,7 +255,7 @@ export default function TrackReport() {
                     className="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000"
                 />
 
-                {/* Overlay FX */}
+                
                 <div className=""></div>
                 <div className="hidden"></div>
 
@@ -273,7 +273,7 @@ export default function TrackReport() {
                     </p>
                 </div>
 
-                {/* Decorative Map Elements */}
+                
                 <div className="absolute top-[30%] left-[40%] z-20">
                     <div className="relative flex items-center justify-center size-12">
                         <div className="pulse-ring absolute inset-0"></div>

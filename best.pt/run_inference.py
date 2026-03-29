@@ -3,19 +3,19 @@ import os
 import shutil
 
 def run_inference():
-    # Model path (directory containing weights or the .pt file itself)
-    # Since best.pt is a directory, YOLO() usually expects the path to the directory or the weight file inside.
-    # However, standard YOLO .pt files are usually single files.
-    # If it's a directory, let's try passing the directory path first.
+    
+    
+    
+    
     model_path = r'c:\Users\ashut\OneDrive\Desktop\A\civicsense\best (1).pt\best (1).pt'
     
     print(f"Loading model from: {model_path}")
     model = YOLO(model_path)
     
-    # Source image directory
+    
     source_dir = r'c:\Users\ashut\OneDrive\Desktop\A\civicsense\backend\uploads'
     
-    # Output directory
+    
     output_dir = r'c:\Users\ashut\OneDrive\Desktop\A\civicsense\best.pt\results'
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
@@ -36,10 +36,10 @@ def run_inference():
         try:
             results = model(img_path)
             
-            # Save detection results
+            
             for r in results:
-                # results save to 'runs/detect/predict' by default, 
-                # we'll move them to our results folder.
+                
+                
                 r.save(filename=os.path.join(output_dir, f"detected_{img_name}"))
         except Exception as e:
             print(f"Failed to process {img_name} (skipping): {e}")

@@ -49,7 +49,7 @@ export default function CitizenLocationPicker({
         return null;
     };
 
-    // Initial load and geolocation
+    
     useEffect(() => {
         const loadDeps = async () => {
             try {
@@ -57,8 +57,8 @@ export default function CitizenLocationPicker({
                     import('leaflet'),
                     import('react-leaflet')
                 ]);
-                // Fix Leaflet icons
-                // @ts-ignore
+                
+                
                 delete L.default.Icon.Default.prototype._getIconUrl;
                 L.default.Icon.Default.mergeOptions({
                     iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -82,7 +82,7 @@ export default function CitizenLocationPicker({
                 },
                 (err) => {
                     setGeoError("Could not detect your exact location. Please adjust the pin manually.");
-                    // Default to Kathmandu if location fails
+                    
                     const defaultPos = { lat: 27.7172, lng: 85.3240 };
                     setPosition(defaultPos);
                     onLocationSelect(defaultPos);
@@ -90,14 +90,14 @@ export default function CitizenLocationPicker({
                 { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
             );
         } else if (!initialLocation) {
-            // Default to Kathmandu
+            
             const defaultPos = { lat: 27.7172, lng: 85.3240 };
             setPosition(defaultPos);
             onLocationSelect(defaultPos);
         }
     }, []);
 
-    // Helper component to handle map clicks
+    
     const LocationPickerEvents = () => {
         if (!LeafletMap) return null;
         LeafletMap.useMapEvents({
@@ -110,7 +110,7 @@ export default function CitizenLocationPicker({
         return null;
     };
 
-    // Memoize event handlers to prevent unnecessary re-renders
+    
     const eventHandlers = useMemo(
         () => ({
             dragend() {
@@ -169,7 +169,7 @@ export default function CitizenLocationPicker({
                     </Marker>
                 </MapContainer>
 
-                {/* Accessibility & Accuracy Overlays */}
+                
                 <div className="absolute top-2 left-2 z-[1000] pointer-events-none">
                     {accuracy && accuracy > 100 && (
                         <div className="bg-amber-100 border border-amber-300 text-amber-800 text-xs px-3 py-2 rounded shadow-sm font-medium flex items-center gap-2">
@@ -183,7 +183,7 @@ export default function CitizenLocationPicker({
                     )}
                 </div>
 
-                {/* GPS Tracking Button */}
+                
                 <button
                     onClick={(e) => {
                         e.preventDefault();

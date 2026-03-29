@@ -4,10 +4,19 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+const fileFilter = (req, file, cb) => {
+    if (allowedMimeTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type. Only JPEG, PNG, and WEBP are allowed.'), false);
+    }
+};
+
 let storage;
 
 if (process.env.CLOUDINARY_API_KEY) {
-    // Configure Cloudinary
     cloudinary.config({
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
         api_key: process.env.CLOUDINARY_API_KEY,
@@ -23,7 +32,6 @@ if (process.env.CLOUDINARY_API_KEY) {
         },
     });
 } else {
-    // Fallback to local storage
     const uploadDir = path.join(__dirname, '../uploads');
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
@@ -41,9 +49,17 @@ if (process.env.CLOUDINARY_API_KEY) {
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    fileFilter: fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+const uploadProfilePhoto = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 20 * 1024 * 1024 },
 });
 
 console.log('✅ Multer Upload Middleware initialized with', process.env.CLOUDINARY_API_KEY ? 'Cloudinary' : 'Local Storage');
 
 module.exports = upload;
+module.exports.uploadProfilePhoto = uploadProfilePhoto;

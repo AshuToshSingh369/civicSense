@@ -3,14 +3,14 @@ import { Link } from "react-router";
 export default function Footer() {
     return (
         <footer className="relative bg-[#0b0f19] text-white pt-24 pb-12 overflow-hidden">
-            {/* Background Decorations */}
+            
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-30" />
             <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
             
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
                     
-                    {/* Brand Section */}
+                    
                     <div className="flex flex-col gap-6">
                         <div className="flex items-center gap-3 group">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
@@ -30,7 +30,7 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Links - Platform */}
+                    
                     <div>
                         <h4 className="text-sm font-black uppercase tracking-[0.2em] mb-8 text-primary/80">Platform</h4>
                         <ul className="flex flex-col gap-4 text-sm font-medium text-slate-400">
@@ -41,7 +41,7 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Links - Regional */}
+                    
                     <div>
                         <h4 className="text-sm font-black uppercase tracking-[0.2em] mb-8 text-primary/80">Active Zones</h4>
                         <ul className="flex flex-col gap-4 text-sm font-medium text-slate-400">
@@ -52,7 +52,7 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Contact Section */}
+                    
                     <div className="flex flex-col gap-6">
                         <h4 className="text-sm font-black uppercase tracking-[0.2em] mb-2 text-primary/80">Support</h4>
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
@@ -63,7 +63,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
+                
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex gap-8 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                         <Link to="#" className="hover:text-white transition-colors">Privacy</Link>

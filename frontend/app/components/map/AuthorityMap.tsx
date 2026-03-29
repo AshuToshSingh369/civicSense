@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-// @ts-ignore
+
 import useSupercluster from 'use-supercluster';
 import { getStatusIconHtml } from './IssueMarker';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface Issue {
     _id: string;
@@ -22,7 +22,7 @@ interface AuthorityMapProps {
     onMarkerClick?: (issueId: string) => void;
 }
 
-// ─── Heat Intensity logic ─────────────────────────────────────────────────────
+
 
 const ISSUE_WEIGHTS: Record<string, number> = {
     'Pothole': 0.8,
@@ -34,14 +34,14 @@ const ISSUE_WEIGHTS: Record<string, number> = {
 };
 
 const NEON_GRADIENT = {
-    0.2: "#00f5ff", // Neon Cyan
-    0.4: "#00ff85", // Neon Green
-    0.6: "#f9ff00", // Neon Yellow
-    0.8: "#ff7b00", // Neon Orange
-    1.0: "#ff0055"  // Neon Red
+    0.2: "#00f5ff", 
+    0.4: "#00ff85", 
+    0.6: "#f9ff00", 
+    0.8: "#ff7b00", 
+    1.0: "#ff0055"  
 };
 
-// ─── HeatLayer Component (inner — must live inside MapContainer) ──────────────
+
 
 interface HeatLayerProps {
     issues: Issue[];
@@ -54,14 +54,14 @@ function HeatLayer({ issues, visible, LeafletMap }: HeatLayerProps) {
     const map = LeafletMap.useMap();
     const [zoom, setZoom] = useState(map.getZoom());
 
-    // Sync zoom for radius calculation
+    
     useEffect(() => {
         const onZoom = () => setZoom(map.getZoom());
         map.on('zoomend', onZoom);
         return () => { map.off('zoomend', onZoom); };
     }, [map]);
 
-    // Build heat data: [lat, lng, intensity]
+    
     const heatData = useMemo<[number, number, number][]>(() => {
         return issues
             .filter(i =>
@@ -71,8 +71,8 @@ function HeatLayer({ issues, visible, LeafletMap }: HeatLayerProps) {
             )
             .map(i => {
                 const weight = ISSUE_WEIGHTS[i.issueType || 'General'] || 0.4;
-                const severity = i.severity || 3; // 1-5
-                // Normalize intensity to 0-1 range roughly
+                const severity = i.severity || 3; 
+                
                 const intensity = (severity / 5) * weight;
                 return [
                     i.coordinates.lat,
@@ -82,7 +82,7 @@ function HeatLayer({ issues, visible, LeafletMap }: HeatLayerProps) {
             });
     }, [issues]);
 
-    // Add / update / remove heat layer
+    
     useEffect(() => {
         if (!map) return;
 
@@ -97,8 +97,8 @@ function HeatLayer({ issues, visible, LeafletMap }: HeatLayerProps) {
             const L = (window as any).L ?? LeafletMap.L;
             if (!L?.heatLayer) return;
 
-            // Dynamic radius based on zoom
-            // radius = 15 + (zoomLevel * 2)
+            
+            
             const dynamicRadius = 15 + (zoom * 2);
 
             const layer = L.heatLayer(heatData, {
@@ -122,7 +122,7 @@ function HeatLayer({ issues, visible, LeafletMap }: HeatLayerProps) {
     return null;
 }
 
-// ─── Main AuthorityMap Component ─────────────────────────────────────────────
+
 
 export default function AuthorityMap({
     issues: initialIssues,
@@ -139,16 +139,16 @@ export default function AuthorityMap({
     const [issues, setIssues] = useState<Issue[]>(initialIssues);
     const [pulseLocation, setPulseLocation] = useState<[number, number] | null>(null);
 
-    // Filters
-    const [timeFilter, setTimeFilter] = useState('all'); // all, 24h, 7d
+    
+    const [timeFilter, setTimeFilter] = useState('all'); 
     const [minSeverity, setMinSeverity] = useState(1);
 
-    // Sync with initialIssues prop
+    
     useEffect(() => {
         setIssues(initialIssues);
     }, [initialIssues]);
 
-    // Load Leaflet on the client only
+    
     useEffect(() => {
         setIsClient(true);
         const loadDeps = async () => {
@@ -165,7 +165,7 @@ export default function AuthorityMap({
         loadDeps();
     }, []);
 
-    // Real-time listener for "newIssue"
+    
     useEffect(() => {
         let socket: any;
 
@@ -178,7 +178,7 @@ export default function AuthorityMap({
                     console.log('[Heatmap] New issue received for animation:', newIssue);
                     setIssues(prev => [newIssue, ...prev]);
 
-                    // Trigger Pulse animation
+                    
                     if (newIssue.coordinates) {
                         setPulseLocation([newIssue.coordinates.lat, newIssue.coordinates.lng]);
                         setTimeout(() => setPulseLocation(null), 4000);
@@ -196,13 +196,13 @@ export default function AuthorityMap({
         };
     }, []);
 
-    // Filtered Issues
+    
     const filteredIssues = useMemo(() => {
         return issues.filter(issue => {
-            // Severity filter
+            
             if (issue.severity && issue.severity < minSeverity) return false;
 
-            // Time filter
+            
             if (timeFilter !== 'all' && issue.createdAt) {
                 const created = new Date(issue.createdAt).getTime();
                 const now = Date.now();
@@ -216,7 +216,7 @@ export default function AuthorityMap({
         });
     }, [issues, minSeverity, timeFilter]);
 
-    // ── Supercluster ──────────────────────────────────────────────────────────
+    
 
     const points = useMemo(() => {
         return filteredIssues
@@ -243,7 +243,7 @@ export default function AuthorityMap({
         options: { radius: 75, maxZoom: 18 },
     });
 
-    // ── Map Event Listener ───────────────────────────────────────────────────
+    
 
     const MapEvents = useCallback(() => {
         if (!LeafletMap) return null;
@@ -266,7 +266,7 @@ export default function AuthorityMap({
         return null;
     }, [LeafletMap, bounds]);
 
-    // ── Pulse Circle component for real-time alerts ───────────────────────────
+    
     const PulseEffect = () => {
         const map = LeafletMap.useMap();
         if (!pulseLocation) return null;
@@ -299,7 +299,7 @@ export default function AuthorityMap({
     const { MapContainer, TileLayer, Marker, useMap } = LeafletMap;
     const { L } = LeafletMap;
 
-    // ── Cluster marker sub-component ──────────────────────────────────────────
+    
     const ClusterMarker = ({ position, icon, expansionZoom }: {
         position: [number, number];
         icon: any;
@@ -317,7 +317,7 @@ export default function AuthorityMap({
         );
     };
 
-    // ── Render ────────────────────────────────────────────────────────────────
+    
 
     return (
         <div className="w-full h-full relative z-0 group/map">
@@ -335,7 +335,7 @@ export default function AuthorityMap({
                 }
             `}} />
 
-            {/* ── Glassmorphism Controls ── */}
+            
             <div className="absolute top-6 left-6 z-[1000] flex flex-col gap-4">
                 <div className="bg-white/80 backdrop-blur-xl border border-border-muted p-4 rounded-2xl shadow-2xl flex flex-col gap-3 min-w-[200px]">
                     <h4 className="text-[10px] font-mono font-bold text-primary uppercase tracking-[0.2em] mb-1">Tactical Analysis</h4>
@@ -372,7 +372,7 @@ export default function AuthorityMap({
                 </div>
             </div>
 
-            {/* ── Layer Toggles ── */}
+            
             <div className="absolute top-6 right-6 z-[1000] flex flex-col gap-2">
                 <button
                     onClick={() => setShowHeat(prev => !prev)}
@@ -463,7 +463,7 @@ export default function AuthorityMap({
                         );
                     }
 
-                    // Individual issue marker
+                    
                     const statusIcon = L.divIcon({
                         html: getStatusIconHtml(cluster.properties.status),
                         className: 'custom-leaflet-icon',

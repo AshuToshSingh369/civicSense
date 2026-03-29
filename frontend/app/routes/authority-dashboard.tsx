@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import AuthorityMap from "../components/map/AuthorityMap";
 import { motion, AnimatePresence } from "framer-motion";
 import { JURISDICTIONS_DATA } from "../utils/jurisdictions";
+import ProfilePhotoUpload from "../components/ProfilePhotoUpload";
 
 export default function AuthorityDashboard() {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function AuthorityDashboard() {
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [socketAlert, setSocketAlert] = useState<{ message: string, type: 'info' | 'critical' } | null>(null);
 
-    // Create Authority State
+    
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [createFormData, setCreateFormData] = useState({
         name: "",
@@ -29,7 +30,7 @@ export default function AuthorityDashboard() {
     const [isCreating, setIsCreating] = useState(false);
 
     useEffect(() => {
-        // Redirect if not authority
+        
         if (user && user.role !== 'authority' && user.role !== 'admin') {
             navigate('/dashboard');
         }
@@ -43,9 +44,9 @@ export default function AuthorityDashboard() {
                 const responseData = await response.json();
                 const allReports = Array.isArray(responseData.data) ? responseData.data : [];
 
-                // Hierarchical UI Handling:
-                // Chairman and Admin see everything. 
-                // Standard authorities see only their jurisdiction.
+                
+                
+                
                 const isGlobalUser = user.role === 'admin' || user.email === 'chairman@gmail.com';
                 const filtered = isGlobalUser ? allReports : allReports.filter((r: any) => r.targetDepartment === user.departmentCode);
                 setReports(filtered);
@@ -58,18 +59,18 @@ export default function AuthorityDashboard() {
 
         fetchAllReports();
 
-        // Socket.io Real-time Setup
-        const socket = io("/"); // Backend is same origin in production, or proxy in dev
+        
+        const socket = io("/"); 
 
         if (user?.departmentCode) {
             socket.emit('join_department', user.departmentCode);
 
             socket.on('department_alert', (data) => {
                 setSocketAlert({ message: data.message, type: 'critical' });
-                // Prepend new report if it matches department
+                
                 setReports(prev => [data.report, ...prev]);
 
-                // Clear alert after 5s
+                
                 setTimeout(() => setSocketAlert(null), 8000);
             });
 
@@ -149,13 +150,13 @@ export default function AuthorityDashboard() {
         const { name, value } = e.target;
         setCreateFormData(prev => ({ ...prev, [name]: value }));
 
-        // Reset sub-city if city changes
+        
         if (name === "tempCity") {
             setCreateFormData(prev => ({ ...prev, homeDepartment: "", departmentCode: "" }));
         }
 
-        // If department code is selected (Active Sub-City), also set homeDepartment to match for consistency
-        // In this app logic: departmentCode = functional jurisdiction, homeDepartment = physical location
+        
+        
         if (name === "departmentCode") {
             setCreateFormData(prev => ({ ...prev, homeDepartment: value }));
         }
@@ -177,23 +178,23 @@ export default function AuthorityDashboard() {
         resolved: reports.filter(r => r.status === 'resolved').length,
     };
 
-    // Live Map Focus Logic
+    
     const getCityCenter = (deptCode: string): { center: [number, number], zoom: number } => {
-        // default to Nepal center
+        
         const defaultView: { center: [number, number], zoom: number } = { center: [28.3949, 84.1240], zoom: 7 };
 
         if (!deptCode) return defaultView;
 
-        // Map department codes to city centers
+        
         const cityCenters: Record<string, [number, number]> = {
-            'KTM': [27.7172, 85.3240], // Kathmandu
-            'LAL': [27.6644, 85.3188], // Lalitpur
-            'BKT': [27.6710, 85.4298], // Bhaktapur
-            'PKR': [28.2095, 83.9856], // Pokhara
-            'BRT': [26.4525, 87.2718], // Biratnagar
-            'BHP': [27.6833, 84.4333], // Bharatpur
-            'JKP': [26.7271, 85.9229], // Janakpur
-            'HTD': [27.4264, 85.0333], // Hetauda
+            'KTM': [27.7172, 85.3240], 
+            'LAL': [27.6644, 85.3188], 
+            'BKT': [27.6710, 85.4298], 
+            'PKR': [28.2095, 83.9856], 
+            'BRT': [26.4525, 87.2718], 
+            'BHP': [27.6833, 84.4333], 
+            'JKP': [26.7271, 85.9229], 
+            'HTD': [27.4264, 85.0333], 
         };
 
         const match = Object.keys(cityCenters).find(key => deptCode.includes(key));
@@ -206,7 +207,7 @@ export default function AuthorityDashboard() {
 
     const [mapViewState, setMapViewState] = useState<{ center: [number, number], zoom: number }>(getCityCenter(user?.departmentCode || ''));
 
-    // Effect to reset view if department changes (unlikely for a single session but good practice)
+    
     useEffect(() => {
         if (user?.departmentCode) {
             setMapViewState(getCityCenter(user.departmentCode));
@@ -219,7 +220,7 @@ export default function AuthorityDashboard() {
                 center: [issue.coordinates.lat, issue.coordinates.lng],
                 zoom: 16
             });
-            // Also scroll for mobile if needed, though this is for the map
+            
         }
     };
 
@@ -227,7 +228,7 @@ export default function AuthorityDashboard() {
         <div className="min-h-screen bg-background-muted font-sans text-text-main selection:bg-primary selection:text-text-main relative overflow-x-hidden">
             
 
-            {/* Real-time Socket Alert */}
+            
             <AnimatePresence>
                 {socketAlert && (
                     <motion.div
@@ -252,7 +253,7 @@ export default function AuthorityDashboard() {
                 )}
             </AnimatePresence>
 
-            {/* Create Authority Modal */}
+            
             <AnimatePresence>
                 {showCreateModal && (
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-[#000000cc] backdrop-blur-md">
@@ -373,7 +374,7 @@ export default function AuthorityDashboard() {
                 )}
             </AnimatePresence>
 
-            {/* Dashboard Header */}
+            
             <header className="bg-white sticky top-0 z-50 border-b border-border-muted shadow-sm">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-3 group">
@@ -396,8 +397,8 @@ export default function AuthorityDashboard() {
                         </div>
 
                         <div className="flex items-center gap-6">
+                            <ProfilePhotoUpload size="sm" editable={true} />
                             <span className="text-sm font-medium text-text-main hidden sm:flex items-center gap-2">
-                                <span className="size-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></span>
                                 {user?.name || 'Authorized Personnel'}
                             </span>
                             <button
@@ -415,7 +416,7 @@ export default function AuthorityDashboard() {
                 </div>
             </header>
 
-            {/* Title & Stats Section */}
+            
             <div className="bg-white pt-12 pb-24 px-6 relative border-b border-border-muted z-10 overflow-hidden">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
                 <div className="absolute top-0 right-0 hidden pointer-events-none"></div>
@@ -462,11 +463,11 @@ export default function AuthorityDashboard() {
                 </div>
             </div>
 
-            {/* Main Content: Tactical Split Screen */}
+            
             <main className="max-w-[1600px] mx-auto px-6 -mt-12 pb-24 relative z-20">
                 <div className="grid lg:grid-cols-[1fr,400px] xl:grid-cols-[1fr,500px] gap-8 items-start">
 
-                    {/* Left Column: Operation Queue */}
+                    
                     <div className="order-2 lg:order-1 space-y-8">
 
                         <section className="bg-white border border-border-muted rounded-xl shadow-sm overflow-hidden relative">
@@ -648,7 +649,7 @@ export default function AuthorityDashboard() {
                         </section>
                     </div>
 
-                    {/* Right Column: Sticky Deployment Matrix */}
+                    
                     <aside className="order-1 lg:order-2 lg:sticky lg:top-28 space-y-6">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
@@ -671,14 +672,14 @@ export default function AuthorityDashboard() {
                                     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 }}
                             />
-                            {/* Frame deco */}
+                            
                             <div className="absolute top-4 left-4 z-10 flex gap-1">
                                 <div className="size-1.5 rounded-full bg-primary animate-pulse"></div>
                                 <div className="size-1.5 rounded-full bg-primary/40"></div>
                             </div>
                         </div>
 
-                        {/* Map Legend/Status Overlay */}
+                        
                         <div className="glass-card p-4 rounded-xl border-white/5 bg-background-muted/50">
                             <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-3">Legend</p>
                             <div className="flex flex-wrap gap-4">

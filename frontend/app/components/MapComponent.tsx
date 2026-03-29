@@ -1,8 +1,8 @@
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
 
-// DO NOT import Leaflet or React-Leaflet at the top level
-// as it will crash during SSR (Server-Side Rendering) because 'window' is not defined.
+
+
 
 interface Report {
     _id: string;
@@ -36,15 +36,15 @@ export default function MapComponent({
     const [LeafletMap, setLeafletMap] = useState<any>(null);
 
     useEffect(() => {
-        // Dynamically import Leaflet and React-Leaflet only on the client
+        
         const loadLeaflet = async () => {
             const [L, ReactLeaflet] = await Promise.all([
                 import("leaflet"),
                 import("react-leaflet")
             ]);
 
-            // Fix Leaflet marker icon issue in React
-            // @ts-ignore
+            
+            
             delete L.default.Icon.Default.prototype._getIconUrl;
             L.default.Icon.Default.mergeOptions({
                 iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
@@ -72,7 +72,7 @@ export default function MapComponent({
 
     const { MapContainer, TileLayer, Marker, Popup, useMapEvents } = LeafletMap;
 
-    // Internal component to handle clicks
+    
     function LocationPicker() {
         useMapEvents({
             click(e: any) {
@@ -94,17 +94,17 @@ export default function MapComponent({
     return (
         <div className="w-full h-[400px] md:h-[500px] overflow-hidden rounded-2xl border-2 border-blue-900/10 shadow-inner z-10 relative">
             <MapContainer
-                // @ts-ignore
+                
                 center={center}
-                // @ts-ignore
+                
                 zoom={zoom}
                 scrollWheelZoom={true}
                 style={{ height: "100%", width: "100%" }}
             >
                 <TileLayer
-                    // @ts-ignore
+                    
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    // @ts-ignore
+                    
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 

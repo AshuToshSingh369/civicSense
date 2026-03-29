@@ -13,7 +13,7 @@ const userSchema = mongoose.Schema({
     password: {
         type: String,
         required: function () {
-            // Password is required only if the user does NOT have a googleId
+            
             return !this.googleId;
         }
     },
@@ -42,29 +42,33 @@ const userSchema = mongoose.Schema({
     otp: {
         code: String,
         expires: Date
+    },
+    profilePhoto: {
+        type: String,
+        default: ''
     }
 
 }, {
     timestamps: true
 });
 
-// ─── DATABASE INDEXES FOR PERFORMANCE OPTIMIZATION ─────────────────────────────
-// Note: email index is automatically created by "unique: true" constraint
-// Do not add explicit index here to avoid duplication
 
-// Role-based queries (filtering by user type)
+
+
+
+
 userSchema.index({ role: 1 });
 
-// Department filtering for authority dashboards
+
 userSchema.index({ departmentCode: 1 });
 
-// Verification status queries
+
 userSchema.index({ isVerified: 1 });
 
-// Composite index for authority filtering
+
 userSchema.index({ role: 1, departmentCode: 1 });
 
-// Time-based queries for user analytics
+
 userSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('User', userSchema);

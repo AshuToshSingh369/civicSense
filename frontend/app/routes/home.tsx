@@ -11,7 +11,7 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface PublicReport {
   _id: string;
@@ -36,7 +36,7 @@ interface Contributor {
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// ─── Inline Location Map ──────────────────────────────────────────────────────
+
 
 interface LocationMapProps {
   lat: number | null;
@@ -120,7 +120,7 @@ function LocationMap({ lat, lng, locationGranted, reports }: LocationMapProps) {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+
 
 export default function Home() {
   const { user } = useAuth();
@@ -191,16 +191,16 @@ export default function Home() {
 
       <main className="flex-grow">
 
-        {/* ── HERO ─────────────────────────────────────────────────────── */}
+        
         <section className="relative overflow-hidden pt-16 pb-28 lg:pt-28 lg:pb-36 bg-background-light">
-          {/* Decorative blobs */}
+          
           <div className="absolute -right-40 -top-40 h-[600px] w-[600px] rounded-full bg-blue-100/60 blur-3xl pointer-events-none" />
           <div className="absolute -left-20 bottom-0 h-[400px] w-[400px] rounded-full bg-indigo-100/60 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
 
-              {/* Left */}
+              
               <div className="flex flex-col justify-center text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 self-center lg:self-start rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-primary ring-1 ring-inset ring-blue-200 mb-6">
                   <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -232,7 +232,7 @@ export default function Home() {
                   </Link>
                 </div>
 
-                {/* Stats row */}
+                
                 <div className="mt-10 flex items-center justify-center lg:justify-start gap-8 text-sm text-slate-500">
                   <div className="text-center">
                     <p className="text-2xl font-extrabold text-slate-900">{loadingStats ? "—" : stats.resolvedIssues.toLocaleString()}</p>
@@ -251,17 +251,17 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right — Floating dashboard widgets + map */}
+              
               <div className="relative lg:h-[560px] flex items-center justify-center">
-                {/* Map as background */}
+                
                 <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-slate-100">
                   <LocationMap lat={userLat} lng={userLng} locationGranted={locationGranted} reports={recentReports} />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-50/60 via-transparent to-transparent pointer-events-none" />
                 </div>
 
-                {/* Overlay widgets */}
+                
                 <div className="relative w-full max-w-sm space-y-4 p-5 self-start mt-6 ml-auto">
-                  {/* Status widget */}
+                  
                   <div className="glass-panel rounded-xl p-4 shadow-lg">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">System Status</h3>
@@ -279,7 +279,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Live feed mini widget */}
+                  
                   <div className="glass-panel rounded-xl p-4 shadow-lg border border-primary/10">
                     <h4 className="text-xs font-bold text-slate-900 mb-3 flex items-center gap-2">
                       <span className="material-symbols-outlined text-primary text-[16px]">bolt</span> Live Incoming
@@ -305,7 +305,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Marquee ticker */}
+          
           <div className="absolute bottom-0 w-full bg-slate-900/5 backdrop-blur-sm py-2 border-t border-slate-200">
             <div className="flex overflow-hidden whitespace-nowrap">
               <div className="animate-marquee flex gap-12 text-sm font-medium text-slate-600 min-w-full">
@@ -320,7 +320,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── HOW IT WORKS (Horizontal Timeline) ───────────────────────── */}
+        
         <section className="py-24 bg-white border-y border-slate-100">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
@@ -331,9 +331,9 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Timeline */}
+            
             <div className="relative">
-              {/* Connecting line */}
+              
               <div className="absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-slate-100 hidden md:block">
                 <div className="h-full w-1/2 bg-gradient-to-r from-primary/40 to-transparent" />
               </div>
@@ -362,7 +362,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── CATEGORIES GRID ──────────────────────────────────────────── */}
+        
         <section className="py-24 bg-background-light relative overflow-hidden">
           <div className="absolute top-[20%] right-[10%] w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-[10%] left-[5%] w-72 h-72 bg-blue-400/5 rounded-full blur-3xl pointer-events-none" />
@@ -378,14 +378,12 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { icon: "gavel", label: "Roads & Potholes", desc: "Report asphalt damage, sinkholes, and road marking issues.", color: "bg-orange-100 text-orange-600" },
-                { icon: "light_mode", label: "Streetlights", desc: "Broken lamps, flickering lights, and electrical hazards.", color: "bg-yellow-100 text-yellow-600" },
-                { icon: "delete", label: "Sanitation", desc: "Missed trash pickups, illegal dumping, and overflowing bins.", color: "bg-green-100 text-green-600" },
-                { icon: "park", label: "Public Parks", desc: "Broken equipment, landscaping needs, and safety concerns.", color: "bg-teal-100 text-teal-600" },
-                { icon: "format_paint", label: "Graffiti", desc: "Vandalism on public property requiring removal.", color: "bg-purple-100 text-purple-600" },
-                { icon: "water_drop", label: "Water Leaks", desc: "Hydrant issues, main line breaks, and drainage problems.", color: "bg-blue-100 text-blue-600" },
+                { icon: "add_road", label: "Roads & Potholes", desc: "Report asphalt damage, sinkholes, and road marking issues.", color: "bg-orange-100 text-orange-600" },
+                { icon: "trip_origin", label: "Manholes", desc: "Report missing or broken manhole covers and associated hazards.", color: "bg-slate-100 text-slate-600" },
+                { icon: "bolt", label: "Electricity", desc: "Report broken streetlights, fallen power lines, and electrical hazards.", color: "bg-yellow-100 text-yellow-600" },
+                { icon: "delete", label: "Garbage", desc: "Report missed trash pickups, illegal dumping, and overflowing bins.", color: "bg-green-100 text-green-600" },
               ].map((cat, i) => (
                 <div key={i} className="group relative overflow-hidden rounded-2xl bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-xl border border-slate-100">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -402,7 +400,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── RECENT REPORTS ───────────────────────────────────────────── */}
+        
         {(loadingReports || recentReports.length > 0) && (
           <section className="py-20 bg-white border-t border-slate-100">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -448,7 +446,7 @@ export default function Home() {
           </section>
         )}
 
-        {/* ── PARTNERS ─────────────────────────────────────────────────── */}
+        
         <section className="py-16 bg-slate-50 border-t border-slate-100">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
             <div className="text-slate-400 font-bold uppercase text-xs tracking-widest mb-8">Official Municipal Partners</div>
@@ -462,7 +460,7 @@ export default function Home() {
 
       </main>
 
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
+      
       <footer className="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
@@ -524,7 +522,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* ── AUTH MODAL ──────────────────────────────────────────────────── */}
+      
       {showAuthModal && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm">
           <div className="bg-white max-w-md w-full rounded-2xl shadow-2xl overflow-hidden">

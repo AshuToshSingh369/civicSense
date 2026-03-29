@@ -5,13 +5,13 @@ filepath = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\da
 with open(filepath, "r", encoding="utf-8") as f:
     content = f.read()
 
-# Make replacements mapping
+
 replacements = [
-    # Main container
+    
     ('className="min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 pb-20 relative selection:bg-primary selection:text-white"', 
      'className="min-h-screen bg-background-muted font-sans text-text-main pb-20 relative selection:bg-primary selection:text-white"'),
     
-    # Animated background
+    
     ('''{/* Background Animated Elements */}
             <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-none">
                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px] mix-blend-screen"></div>
@@ -19,15 +19,15 @@ replacements = [
                 <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
             </div>''', ''),
 
-    # Alert
+    
     ('glass-card text-white shadow-[0_0_30px_#0d93f24d] border border-primary/50', 
      'bg-white text-text-main shadow-sm border border-border-muted'),
 
-    # Header
+    
     ('glass-card sticky top-0 z-50 border-b border-white/10 backdrop-blur-md', 
      'bg-white sticky top-0 z-50 border-b border-border-muted'),
 
-    # Icon block
+    
     ('bg-primary/20 text-primary rounded-lg flex items-center justify-center shadow-[0_0_15px_#0d93f24d] group-hover:bg-primary/30 transition-all border border-primary/40',
      'bg-background-muted text-primary rounded-lg flex items-center justify-center border border-border-muted group-hover:bg-primary group-hover:text-white transition-all'),
 
@@ -40,7 +40,7 @@ replacements = [
     ('text-slate-300 hidden sm:flex', 'text-text-main hidden sm:flex'),
     ('text-slate-400 hover:text-white font-bold', 'text-text-muted hover:text-text-main font-bold'),
 
-    # Banner
+    
     ('relative h-64 overflow-hidden border-b border-white/10 z-10', 'relative h-64 overflow-hidden border-b border-border-muted z-10 bg-white'),
     ('bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent', 'bg-gradient-to-t from-background-light to-transparent'),
     ('size-24 bg-background-dark rounded-2xl border border-primary/40 shadow-[0_0_20px_#0d93f233]', 'size-24 bg-background-muted rounded-2xl border border-border-muted shadow-sm'),
@@ -49,7 +49,7 @@ replacements = [
     ('text-slate-400 font-mono text-sm mt-1', 'text-text-muted text-sm mt-1 font-bold'),
     ('text-purple-400 uppercase', 'text-primary uppercase'),
 
-    # Stats
+    
     ('glass-card p-6 rounded-2xl border-white/10 hover:border-primary/30', 'card-gov hover:border-primary max-sm:p-4'),
     ('glass-card p-6 rounded-2xl border-white/10 hover:border-green-500/30', 'card-gov hover:border-green-500 max-sm:p-4'),
     ('glass-card p-6 rounded-2xl border-white/10 hover:border-amber-500/30', 'card-gov hover:border-amber-500 max-sm:p-4'),
@@ -66,13 +66,13 @@ replacements = [
     ('text-4xl font-bold text-white drop-shadow-[0_0_8px_#0d93f280]', 'text-4xl font-extrabold text-primary'),
     ('absolute -right-4 -top-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl group-hover:bg-primary/30', 'absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-xl group-hover:bg-primary/20'),
 
-    # Actions list
+    
     ('border-b border-white/10 pb-6', 'border-b border-border-muted pb-6'),
     ('text-2xl font-bold text-white tracking-tight', 'text-2xl font-extrabold text-[#003d7a] tracking-tight'),
     ('btn-primary flex items-center', 'btn-gov-primary flex items-center'),
     ('text-primary uppercase tracking-widest animate-pulse', 'text-primary uppercase tracking-widest font-bold animate-pulse'),
 
-    # Cards list
+    
     ('glass-card border-white/10 rounded-xl p-6 hover:border-primary/40', 'card-gov hover:border-primary px-6 py-4'),
     ('absolute left-0 top-0 bottom-0 w-1 bg-white/10 group-hover:bg-primary', 'absolute left-0 top-0 bottom-0 w-1 bg-border-muted group-hover:bg-primary'),
     ('font-mono text-xs text-primary/70 font-bold bg-primary/10 px-2 py-0.5 rounded border border-primary/20', 'text-[10px] text-primary font-bold bg-background-muted px-2 py-0.5 rounded border border-border-muted tracking-widest uppercase'),
@@ -86,7 +86,7 @@ replacements = [
     ('text-xs text-slate-500 font-mono uppercase flex items-center gap-1', 'text-[10px] text-text-muted font-bold uppercase tracking-widest flex items-center gap-1'),
     ('btn-secondary py-2 px-6', 'btn-gov-secondary py-2 px-6'),
 
-    # Empty State
+    
     ('glass-card rounded-2xl border-white/5 border-dashed', 'bg-white rounded-lg border-2 border-border-muted border-dashed'),
     ('absolute inset-0 bg-grid-pattern opacity-5', ''),
     ('bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10', 'bg-background-muted rounded-full flex items-center justify-center mx-auto mb-4 border border-border-muted'),

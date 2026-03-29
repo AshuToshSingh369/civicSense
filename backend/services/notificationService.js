@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-// Initialize transporter with better error handling and fallback
+
 let transporter = null;
 
 const initializeTransporter = () => {
@@ -9,7 +9,7 @@ const initializeTransporter = () => {
             service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS // Use App Password for Gmail with 2FA
+                pass: process.env.EMAIL_PASS 
             }
         });
         console.log('✅ Email transporter initialized with Gmail');
@@ -21,7 +21,7 @@ const initializeTransporter = () => {
     }
 };
 
-// Verify transporter on startup
+
 const verifyTransporter = async () => {
     if (!transporter) return false;
     try {
@@ -34,11 +34,11 @@ const verifyTransporter = async () => {
     }
 };
 
-// Initialize on module load
+
 initializeTransporter();
 verifyTransporter().catch(err => console.error('Transporter verification error:', err));
 
-// ─── Status Change Notifications ───────────────────────────────────────────────
+
 
 exports.sendStatusChangeNotification = async (report, oldStatus, newStatus, authorityName) => {
     const statusMessages = {
@@ -91,14 +91,14 @@ exports.sendStatusChangeNotification = async (report, oldStatus, newStatus, auth
     }
 };
 
-// ─── AI Analysis Notifications ───────────────────────────────────────────────
+
 
 exports.sendNotification = async (report, analysis) => {
     const isCritical = analysis.severityScore >= 8;
     const isHigh = analysis.severityScore >= 6;
 
     if (!isCritical && !isHigh) {
-        return; // No notification needed for low priority
+        return; 
     }
 
     const subject = `${analysis.threatLevel.toUpperCase()} ALERT: ${report.title}`;
@@ -146,7 +146,7 @@ exports.sendNotification = async (report, analysis) => {
     }
 };
 
-// ─── OTP Email (CRITICAL FIX) ───────────────────────────────────────────────
+
 
 exports.sendOTP = async (email, otp) => {
     const subject = `Your CivicSense Verification Code: ${otp}`;

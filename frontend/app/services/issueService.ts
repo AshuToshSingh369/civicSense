@@ -1,17 +1,10 @@
-import axios from 'axios'; // Ensure axial or native fetch is used. I'll use native fetch for less deps.
+import axios from 'axios'; 
 
-// You can configure this base URL depending on your Vite env vars
+
 const API_BASE_URL = '/api';
 
 export const issueService = {
-    /**
-     * Fetch issues within a specific map bounding box (BBox) to prevent loading 10,000 markers at once
-     * @param swLat SouthWest Latitude
-     * @param swLng SouthWest Longitude
-     * @param neLat NorthEast Latitude
-     * @param neLng NorthEast Longitude
-     * @param status Optional filter by status ('pending', 'in-progress', 'resolved')
-     */
+    
     getIssuesInBounds: async (
         swLat: number,
         swLng: number,
@@ -20,7 +13,7 @@ export const issueService = {
         status?: string
     ) => {
         try {
-            // Build query string
+            
             const queryParams = new URLSearchParams({
                 swLat: swLat.toString(),
                 swLng: swLng.toString(),
@@ -40,9 +33,7 @@ export const issueService = {
         }
     },
 
-    /**
-     * Get a single issue's details for a popup
-     */
+    
     getIssueDetails: async (issueId: string) => {
         try {
             const response = await fetch(`${API_BASE_URL}/issues/${issueId}`);

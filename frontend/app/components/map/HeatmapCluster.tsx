@@ -5,7 +5,7 @@ interface HeatmapPoint {
     _id: string;
     coordinates: { lat: number; lng: number };
     issueType: string;
-    severity: number; // 1-5
+    severity: number; 
     status: string;
     createdAt: string;
 }
@@ -18,7 +18,7 @@ interface HeatmapClusterProps {
 }
 
 export default function HeatmapCluster({
-    center = [28.3949, 84.1240], // Nepal default
+    center = [28.3949, 84.1240], 
     zoom = 7,
     className = "w-full h-[600px] rounded-lg shadow-lg border border-gray-300 z-0",
     onMapLoad
@@ -30,7 +30,7 @@ export default function HeatmapCluster({
     const [issues, setIssues] = useState<HeatmapPoint[]>([]);
     const [LeafletMap, setLeafletMap] = useState<any>(null);
 
-    // Load Leaflet libraries
+    
     useEffect(() => {
         setIsClient(true);
 
@@ -43,7 +43,7 @@ export default function HeatmapCluster({
                     import('supercluster')
                 ]);
 
-                // Fix Leaflet icons for Vite
+                
                 delete L.default.Icon.Default.prototype._getIconUrl;
                 L.default.Icon.Default.mergeOptions({
                     iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -69,7 +69,7 @@ export default function HeatmapCluster({
         loadLibraries();
     }, []);
 
-    // Initialize map and heatmap
+    
     const handleMapReady = useCallback((mapInstance: any) => {
         setMap(mapInstance);
 
@@ -77,17 +77,17 @@ export default function HeatmapCluster({
             onMapLoad(mapInstance);
         }
 
-        // Create initial heatmap layer
+        
         const heat = LeafletMap?.heat?.([center], {
             max: 8,
             radius: 25,
             blur: 15,
             gradient: {
-                0.0: '#0000FF', // Blue - Low
-                0.25: '#00FF00', // Green - Low-Medium
-                0.5: '#FFFF00', // Yellow - Medium
-                0.75: '#FF7F00', // Orange - High
-                1.0: '#FF0000' // Red - Critical
+                0.0: '#0000FF', 
+                0.25: '#00FF00', 
+                0.5: '#FFFF00', 
+                0.75: '#FF7F00', 
+                1.0: '#FF0000' 
             }
         });
 
@@ -99,16 +99,16 @@ export default function HeatmapCluster({
         console.log('✅ Heatmap initialized');
     }, [LeafletMap, center, onMapLoad]);
 
-    // Update heatmap with new data
+    
     const updateHeatmap = useCallback((data: HeatmapPoint[]) => {
         if (!heatLayer || !map) return;
 
-        // Convert report coordinates to heatmap format [lat, lng, intensity]
-        // Intensity based on severity (1-5 scale)
+        
+        
         const heatData = data.map(point => [
             point.coordinates.lat,
             point.coordinates.lng,
-            point.severity / 5 // Normalize to 0-1
+            point.severity / 5 
         ]);
 
         if (heatData.length > 0) {
@@ -117,20 +117,20 @@ export default function HeatmapCluster({
         }
     }, [heatLayer, map]);
 
-    // Cluster issues by type
+    
     const clusterByType = useCallback((data: HeatmapPoint[]) => {
         if (!map) return;
 
         const typeGroups: { [key: string]: HeatmapPoint[] } = {};
         const severityColors: { [key: number]: string } = {
-            1: '#3b82f6', // Blue - Low
-            2: '#10b981', // Green - Medium
-            3: '#f59e0b', // Amber - High
-            4: '#ef4444', // Red - Critical
-            5: '#7c3aed'  // Violet - Severe
+            1: '#3b82f6', 
+            2: '#10b981', 
+            3: '#f59e0b', 
+            4: '#ef4444', 
+            5: '#7c3aed'  
         };
 
-        // Group by issue type
+        
         data.forEach(issue => {
             if (!typeGroups[issue.issueType]) {
                 typeGroups[issue.issueType] = [];
@@ -138,7 +138,7 @@ export default function HeatmapCluster({
             typeGroups[issue.issueType].push(issue);
         });
 
-        // Create cluster circles for each type
+        
         Object.entries(typeGroups).forEach(([type, issues]) => {
             const issueCount = issues.length;
             const avgLat = issues.reduce((sum, i) => sum + i.coordinates.lat, 0) / issueCount;
@@ -146,13 +146,13 @@ export default function HeatmapCluster({
             const avgSeverity = Math.ceil(issues.reduce((sum, i) => sum + i.severity, 0) / issueCount);
 
             if (LeafletMap?.CircleMarker && map.eachLayer) {
-                // This would need to be integrated with React-Leaflet's component system
-                // For now, store data for display
+                
+                
             }
         });
     }, [map, LeafletMap]);
 
-    // Fetch initial reports and listen for updates
+    
     useEffect(() => {
         const fetchReports = async () => {
             try {
@@ -178,10 +178,10 @@ export default function HeatmapCluster({
         }
     }, [heatLayer, updateHeatmap]);
 
-    // Socket.io real-time updates
+    
     useEffect(() => {
         const setupSocketListener = async () => {
-            // Dynamically import Socket.io client
+            
             const { io } = await import('socket.io-client');
             const socket = io({
                 reconnection: true,
@@ -242,11 +242,11 @@ export default function HeatmapCluster({
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                {/* Rendered CircleMarkers for cluster visualization */}
-                {/* This section dynamically renders based on zoom level and cluster data */}
+                
+                
             </MapContainer>
 
-            {/* Legend */}
+            
             <div className="absolute bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 z-10">
                 <h3 className="font-bold text-sm mb-3">Severity Level</h3>
                 <div className="space-y-2 text-xs">
@@ -276,7 +276,7 @@ export default function HeatmapCluster({
                 </div>
             </div>
 
-            {/* Stats Bar */}
+            
             <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg border border-gray-200 z-10">
                 <div className="text-xs space-y-1">
                     <p><span className="font-semibold">Pending:</span> {issues.filter(i => i.status === 'pending').length}</p>

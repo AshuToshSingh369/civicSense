@@ -17,13 +17,13 @@ export default function CompleteProfile() {
     });
 
     useEffect(() => {
-        // If user is not logged in, send them to login
+        
         if (!user) {
             navigate("/login");
             return;
         }
 
-        // If user already has location data, send them to dashboard
+        
         if (user.homeDepartment && user.departmentCode) {
             navigate("/dashboard");
         }
@@ -33,7 +33,7 @@ export default function CompleteProfile() {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
-        // Reset sub-city if city changes
+        
         if (name === "tempCity") {
             setFormData(prev => ({ ...prev, homeDepartment: "" }));
         }
@@ -59,14 +59,14 @@ export default function CompleteProfile() {
                 },
                 body: JSON.stringify({
                     homeDepartment: `${formData.homeDepartment}, ${formData.tempCity}`,
-                    departmentCode: formData.homeDepartment // Using sub-city code as departmentCode
+                    departmentCode: formData.homeDepartment 
                 }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                // Update local auth context
+                
                 authLogin(data);
                 navigate("/dashboard");
             } else {
@@ -82,21 +82,21 @@ export default function CompleteProfile() {
 
     return (
         <div className="min-h-screen bg-background-muted flex flex-col lg:flex-row font-sans relative overflow-hidden">
-            {/* Background Decorations */}
+            
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#0d93f20d] rounded-full blur-[120px]"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-[#a855f70d] rounded-full blur-[100px]"></div>
                 <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
             </div>
 
-            {/* Left Panel - Information (Common component) */}
+            
             <AuthSidebar
                 title1="Node"
                 title2="Configuration"
                 subtitle="Almost there! Tell us your location so we can route your reports to the right municipality."
             />
 
-            {/* Right Panel - Form (Neon Theme) */}
+            
             <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}

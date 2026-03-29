@@ -6,11 +6,11 @@ const clearData = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('MongoDB Connected for cleanup...');
 
-        // Clear Users
+        
         await mongoose.connection.db.collection('users').deleteMany({});
         console.log('All Users cleared.');
 
-        // Clear Reports
+        
         await mongoose.connection.db.collection('reports').deleteMany({});
         console.log('All Reports cleared.');
 

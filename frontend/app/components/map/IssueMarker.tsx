@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router'; // React Router v7
+import { Link } from 'react-router'; 
 
 interface IssueMarkerProps {
     issue: {
@@ -14,18 +14,18 @@ interface IssueMarkerProps {
     };
 }
 
-// Marker customisation - returns an HTML string for a DivIcon
+
 export const getStatusIconHtml = (status: string) => {
     let color;
     switch (status) {
         case 'pending':
-            color = '#ff0055'; // Neon Red
+            color = '#ff0055'; 
             break;
         case 'in-progress':
-            color = '#0d93f2'; // Neon Blue
+            color = '#0d93f2'; 
             break;
         case 'resolved':
-            color = '#00ff85'; // Neon Green
+            color = '#00ff85'; 
             break;
         default:
             color = '#64748b';
@@ -60,7 +60,7 @@ export default function IssueMarker({ issue }: IssueMarkerProps) {
 
     const statusIcon = L.divIcon({
         html: getStatusIconHtml(issue.status),
-        className: 'custom-leaflet-icon', // Use custom class to avoid default wrapper styles
+        className: 'custom-leaflet-icon', 
         iconSize: [32, 32],
         iconAnchor: [16, 32],
         popupAnchor: [0, -32]

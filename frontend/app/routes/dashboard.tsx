@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "../context/AuthContext";
+import ProfilePhotoUpload from "../components/ProfilePhotoUpload";
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -11,7 +12,7 @@ export default function Dashboard() {
     const { user, logout } = useAuth();
 
     useEffect(() => {
-        // Redirect authorities/admins to their portal
+        
         if (user && (user.role === 'authority' || user.role === 'admin')) {
             navigate('/authority-dashboard');
         }
@@ -24,9 +25,9 @@ export default function Dashboard() {
                 });
                 const data = await response.json();
 
-                // If citizen, filter reports to only show their own
+                
                 if (user.role === 'citizen') {
-                    // Logic would usually be on backend, but ensuring here
+                    
                 }
                 setReports(Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []));
             } catch (error) {
@@ -38,7 +39,7 @@ export default function Dashboard() {
 
         fetchReports();
 
-        // Real-time Updates
+        
         const socket = io("/");
 
         socket.on('status_updated', (updatedReport) => {
@@ -75,7 +76,7 @@ export default function Dashboard() {
 
             
 
-            {/* Real-time Notification for Citizen */}
+            
             {socketAlert && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md animate-fade-in-down">
                     <div className="mx-4 p-4 rounded-xl bg-white text-text-main shadow-sm border border-border-muted flex items-center gap-3">
@@ -85,7 +86,7 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* Dashboard Header */}
+            
             <header className="bg-white sticky top-0 z-50 border-b border-border-muted">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-3 group">
@@ -117,17 +118,14 @@ export default function Dashboard() {
                 </div>
             </header>
 
-            {/* Hero Profile Banner */}
+            
             <div className="relative h-64 overflow-hidden border-b border-border-muted z-10 bg-white">
                 <div className="absolute inset-0 bg-primary/5"></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-background-light to-transparent"></div>
 
                 <div className="max-w-7xl mx-auto px-6 h-full flex flex-col justify-end pb-8 relative z-10">
                     <div className="flex items-end gap-6">
-                        <div className="size-24 bg-background-muted rounded-2xl border border-border-muted shadow-sm overflow-hidden flex items-center justify-center text-4xl mb-[-12px] relative group cursor-pointer">
-                            <div className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors"></div>
-                            <span className="material-symbols-outlined text-5xl text-primary relative z-10">person</span>
-                        </div>
+                        <ProfilePhotoUpload size="lg" editable={true} />
                         <div className="mb-2">
                             <h1 className="text-3xl font-extrabold text-[#003d7a] tracking-tight flex items-center gap-3">
                                 {user?.name || 'Your'}'s Reports

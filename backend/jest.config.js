@@ -1,6 +1,4 @@
-/**
- * JestConfiguration
- */
+
 
 module.exports = {
     testEnvironment: 'node',

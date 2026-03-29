@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const reportSchema = mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        required: false, // Can be anonymous or referenced
+        required: false, 
         ref: 'User'
     },
     title: {
@@ -12,7 +12,7 @@ const reportSchema = mongoose.Schema({
     },
     description: {
         type: String,
-        required: false // Made optional as we rely on AI detection and contact number
+        required: false 
     },
     contactNumber: {
         type: String,
@@ -77,7 +77,7 @@ const reportSchema = mongoose.Schema({
     aiProcessedAt: {
         type: Date
     },
-    // GeoJSON for heatmap and spatial queries
+    
     locationData: {
         type: {
             type: String,
@@ -85,7 +85,7 @@ const reportSchema = mongoose.Schema({
             default: 'Point'
         },
         coordinates: {
-            type: [Number], // [lng, lat]
+            type: [Number], 
             required: true
         }
     },
@@ -119,35 +119,35 @@ const reportSchema = mongoose.Schema({
     timestamps: true
 });
 
-// ─── DATABASE INDEXES FOR PERFORMANCE OPTIMIZATION ─────────────────────────────
-// Geospatial index for location-based queries (heatmap, nearby reports)
+
+
 reportSchema.index({ locationData: '2dsphere' });
 
-// Status filtering (most common query in dashboards)
+
 reportSchema.index({ status: 1 });
 
-// Department-based filtering for authority dashboards
+
 reportSchema.index({ targetDepartment: 1 });
 
-// Combined index for dashboard queries (department + status)
+
 reportSchema.index({ targetDepartment: 1, status: 1 });
 
-// Time-based queries (recent reports)
+
 reportSchema.index({ createdAt: -1 });
 
-// User-based queries (citizen's own reports)
+
 reportSchema.index({ user: 1 });
 
-// Severity-based queries (high priority reports)
+
 reportSchema.index({ severity: -1 });
 
-// Full-text search index on title and description
+
 reportSchema.index({ title: 'text', description: 'text', location: 'text' });
 
-// Composite index for complex queries
+
 reportSchema.index({ targetDepartment: 1, status: 1, severity: -1, createdAt: -1 });
 
-// AI Analysis queries
+
 reportSchema.index({ 'aiAnalysis.threatLevel': 1 });
 reportSchema.index({ 'aiAnalysis.severityScore': -1 });
 

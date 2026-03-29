@@ -93,10 +93,10 @@ export default function Signup() {
                 subtitle="Create your account to start reporting issues in your local community and track their resolution progress."
             />
 
-            {/* Right panel */}
+            
             <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:px-16 lg:py-10 bg-white overflow-y-auto">
                 <div className="w-full max-w-md">
-                    {/* Logo */}
+                    
                     <div className="mb-8 text-center">
                         <Link to="/" className="inline-flex items-center gap-2 mb-6 group">
                             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white group-hover:bg-primary-dark transition-colors">
@@ -109,7 +109,7 @@ export default function Signup() {
                     </div>
 
                     <Form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                        {/* Name row */}
+                        
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className={labelCls}>First Name</label>
@@ -123,14 +123,14 @@ export default function Signup() {
                             </div>
                         </div>
 
-                        {/* Email */}
+                        
                         <div>
                             <label className={labelCls}>Email or Mobile Number</label>
                             <input name="email" type="text" className={inputCls(!!errors.email)} placeholder="name@example.com" value={formData.email} onChange={handleChange} />
                             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                         </div>
 
-                        {/* Municipality */}
+                        
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className={labelCls}>Municipality</label>
@@ -154,7 +154,7 @@ export default function Signup() {
                             )}
                         </div>
 
-                        {/* Password */}
+                        
                         <div>
                             <label className={labelCls}>Password</label>
                             <div className="relative">
@@ -166,7 +166,7 @@ export default function Signup() {
                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                         </div>
 
-                        {/* Confirm Password */}
+                        
                         <div>
                             <label className={labelCls}>Confirm Password</label>
                             <input name="confirmPassword" type="password" className={inputCls(!!errors.confirmPassword)} placeholder="••••••••" value={formData.confirmPassword} onChange={handleChange} />
@@ -185,7 +185,7 @@ export default function Signup() {
                         </button>
                     </Form>
 
-                    {/* Divider */}
+                    
                     <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
                         <div className="relative flex justify-center text-xs text-slate-400 font-medium">
@@ -193,7 +193,7 @@ export default function Signup() {
                         </div>
                     </div>
 
-                    {/* Google */}
+                    
                     <a
                         href="http://localhost:5000/api/auth/google"
                         className="w-full flex items-center justify-center gap-3 border border-slate-200 text-slate-700 py-3 rounded-lg font-semibold text-sm shadow-sm hover:bg-slate-50 transition-all"

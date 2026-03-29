@@ -1,45 +1,39 @@
-/**
- * CivicSense Backend - Unit Tests
- * Jest + Supertest
- * 
- * Run tests: npm test
- * Run tests with coverage: npm test -- --coverage
- */
+
 
 const request = require('supertest');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Report = require('../models/Report');
 
-// Mock express app for testing
+
 let app;
 
 beforeAll(async () => {
-    // Connect to test database
+    
     if (process.env.NODE_ENV !== 'test') {
         process.env.NODE_ENV = 'test';
         process.env.MONGO_URI = 'mongodb://localhost:27017/civicsense_test';
         process.env.JWT_SECRET = 'test_secret';
     }
 
-    // Initialize app
+    
     app = require('../server');
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for server startup
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
 });
 
 afterAll(async () => {
-    // Clean up test database
+    
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
 });
 
 beforeEach(async () => {
-    // Clear collections before each test
+    
     await User.deleteMany({});
     await Report.deleteMany({});
 });
 
-// ─── AUTHENTICATION TESTS ─────────────────────────────────────────────────────
+
 
 describe('Authentication API', () => {
     describe('POST /api/auth/register', () => {
@@ -97,13 +91,13 @@ describe('Authentication API', () => {
                 password: 'securePassword123'
             };
 
-            // First registration
+            
             await request(app)
                 .post('/api/auth/register')
                 .send(userData)
                 .expect(201);
 
-            // Duplicate registration
+            
             const response = await request(app)
                 .post('/api/auth/register')
                 .send(userData)
@@ -166,7 +160,7 @@ describe('Authentication API', () => {
     });
 });
 
-// ─── REPORT TESTS ─────────────────────────────────────────────────────────────
+
 
 describe('Report API', () => {
     let token;
@@ -175,7 +169,7 @@ describe('Report API', () => {
     let authorityId;
 
     beforeEach(async () => {
-        // Create citizen user
+        
         const salt = await require('bcryptjs').genSalt(10);
         const hashedPassword = await require('bcryptjs').hash('securePassword123', salt);
 
@@ -189,7 +183,7 @@ describe('Report API', () => {
 
         userId = citizenUser._id;
 
-        // Create authority user
+        
         const authorityUser = await User.create({
             name: 'Jane Authority',
             email: 'authority@example.com',
@@ -201,7 +195,7 @@ describe('Report API', () => {
 
         authorityId = authorityUser._id;
 
-        // Generate tokens (simplified - in real tests, use actual auth)
+        
         const jwt = require('jsonwebtoken');
         token = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
         authorityToken = jwt.sign({ id: authorityId }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -364,4 +358,4 @@ describe('Report API', () => {
     });
 });
 
-module.exports = {}; // Export for Jest
+module.exports = {}; 

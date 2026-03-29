@@ -7,6 +7,22 @@ export default function Navbar() {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [systemStatus, setSystemStatus] = useState<"online" | "offline" | "checking">("checking");
+
+    useEffect(() => {
+        const checkHealth = async () => {
+            try {
+                const res = await fetch("/health");
+                if (res.ok) setSystemStatus("online");
+                else setSystemStatus("offline");
+            } catch {
+                setSystemStatus("offline");
+            }
+        };
+        checkHealth();
+        const interval = setInterval(checkHealth, 30000);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -31,18 +47,24 @@ export default function Navbar() {
             }`}
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-                {/* Logo */}
+                
                 <Link to="/" className="flex items-center gap-2.5 group transition-transform hover:scale-[1.02] active:scale-95">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all">
                         <span className="material-symbols-outlined text-[24px]">radar</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-black text-xl text-slate-900 tracking-tighter leading-none">CivicSense</span>
+                        <span className="font-black text-xl text-slate-900 tracking-tighter leading-none flex items-center gap-2">
+                            CivicSense
+                            <div 
+                                className={`size-1.5 rounded-full ${systemStatus === 'online' ? 'bg-green-500 shadow-[0_0_5px_#22c55e]' : systemStatus === 'offline' ? 'bg-red-500 shadow-[0_0_5px_#ef4444]' : 'bg-slate-300 animate-pulse'}`}
+                                title={`System is ${systemStatus}`}
+                            />
+                        </span>
                         <span className="text-[9px] font-bold text-primary uppercase tracking-[0.2em] mt-0.5">Nepal Portal</span>
                     </div>
                 </Link>
 
-                {/* Desktop Nav */}
+                
                 <nav className="hidden md:flex items-center bg-slate-100/50 border border-slate-200/60 rounded-full px-1.5 py-1">
                     {[
                         { name: "Global Map", path: "/" },
@@ -65,7 +87,7 @@ export default function Navbar() {
                     })}
                 </nav>
 
-                {/* Auth Actions */}
+                
                 <div className="hidden md:flex items-center gap-3">
                     {user ? (
                         <Link to={user.role === 'authority' || user.role === 'admin' ? "/authority-dashboard" : "/dashboard"}>
@@ -89,7 +111,7 @@ export default function Navbar() {
                     )}
                 </div>
 
-                {/* Mobile Menu Toggle */}
+                
                 <button 
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="md:hidden p-2 text-slate-600 hover:text-primary transition-colors focus:outline-none"
@@ -100,7 +122,7 @@ export default function Navbar() {
                 </button>
             </div>
 
-            {/* Mobile Menu Dropdown */}
+            
             {isMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 w-full bg-white border-t border-slate-100 py-6 px-6 space-y-4 shadow-2xl animate-fade-in-down">
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 text-slate-600 font-bold p-3 rounded-xl hover:bg-slate-50">

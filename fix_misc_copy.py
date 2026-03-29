@@ -1,6 +1,6 @@
 import os
 
-# auth.complete-profile.tsx
+
 auth_cp = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\auth.complete-profile.tsx"
 with open(auth_cp, "r", encoding="utf-8") as f:
     c = f.read()
@@ -15,7 +15,7 @@ with open(auth_cp, "w", encoding="utf-8") as f:
     f.write(c)
 print("auth.complete-profile.tsx ✓")
 
-# verify-otp.tsx
+
 otp = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\verify-otp.tsx"
 with open(otp, "r", encoding="utf-8") as f:
     c = f.read()
@@ -25,7 +25,7 @@ with open(otp, "w", encoding="utf-8") as f:
     f.write(c)
 print("verify-otp.tsx ✓")
 
-# track-report.tsx footer
+
 track = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\track-report.tsx"
 with open(track, "r", encoding="utf-8") as f:
     c = f.read()
@@ -34,7 +34,7 @@ with open(track, "w", encoding="utf-8") as f:
     f.write(c)
 print("track-report footer ✓")
 
-# terms-of-service.tsx
+
 tos = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\terms-of-service.tsx"
 with open(tos, "r", encoding="utf-8") as f:
     c = f.read()
@@ -43,7 +43,7 @@ with open(tos, "w", encoding="utf-8") as f:
     f.write(c)
 print("terms-of-service.tsx ✓")
 
-# privacy-policy.tsx
+
 pp = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\privacy-policy.tsx"
 with open(pp, "r", encoding="utf-8") as f:
     c = f.read()

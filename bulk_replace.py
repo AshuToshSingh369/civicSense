@@ -42,7 +42,7 @@ replacements = [
 ]
 
 for filepath in files_to_process:
-    # Skip dashboard files as they were already handled manually
+    
     if any(x in filepath for x in ["dashboard.tsx", "home.tsx", "login.tsx", "signup.tsx", "verify-otp.tsx", "Navbar.tsx", "Footer.tsx", "app.css"]):
         continue
 

@@ -11,33 +11,33 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                // Check if user already exists
+                
                 let user = await User.findOne({ googleId: profile.id });
 
                 if (user) {
                     return done(null, user);
                 }
 
-                // Look for existing user with same email (link accounts)
+                
                 const email = profile.emails[0].value;
                 user = await User.findOne({ email });
 
                 if (user) {
                     user.googleId = profile.id;
-                    // Auto-verify if they used Google
+                    
                     user.isVerified = true;
                     if (user.otp) user.otp = undefined;
                     await user.save();
                     return done(null, user);
                 }
 
-                // Create new user
+                
                 user = await User.create({
                     name: profile.displayName,
                     email: email,
                     googleId: profile.id,
-                    role: 'citizen', // Default role for new signups
-                    isVerified: true, // Google accounts are implicitly verified
+                    role: 'citizen', 
+                    isVerified: true, 
                 });
 
                 return done(null, user);
@@ -49,7 +49,7 @@ passport.use(
     )
 );
 
-// We won't use sessions, but Passport requires these to be defined
+
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });

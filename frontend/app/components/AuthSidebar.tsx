@@ -7,18 +7,18 @@ interface AuthSidebarProps {
 export default function AuthSidebar({ title1, title2, subtitle }: AuthSidebarProps) {
     return (
         <div className="hidden lg:flex w-1/2 relative overflow-hidden">
-            {/* Nepali landscape photo */}
+            
             <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: "url('/nepal-sidebar.png')" }}
             />
 
-            {/* Dark overlay gradient for text readability */}
+            
             <div className="absolute inset-0 bg-gradient-to-br from-slate-900/85 via-slate-900/60 to-blue-900/40" />
 
-            {/* Content */}
+            
             <div className="relative z-10 p-14 flex flex-col justify-between h-full text-white w-full">
-                {/* Top */}
+                
                 <div>
                     <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
@@ -32,7 +32,7 @@ export default function AuthSidebar({ title1, title2, subtitle }: AuthSidebarPro
                     </div>
                 </div>
 
-                {/* Center */}
+                
                 <div>
                     <h1 className="text-4xl xl:text-5xl font-extrabold leading-tight mb-5 tracking-tight drop-shadow-lg">
                         {title1}<br />
@@ -43,7 +43,7 @@ export default function AuthSidebar({ title1, title2, subtitle }: AuthSidebarPro
                         {subtitle}
                     </p>
 
-                    {/* Feature pills */}
+                    
                     <div className="mt-8 flex flex-col gap-3">
                         {[
                             { icon: "shield", text: "Secure & encrypted access" },
@@ -58,7 +58,7 @@ export default function AuthSidebar({ title1, title2, subtitle }: AuthSidebarPro
                     </div>
                 </div>
 
-                {/* Bottom */}
+                
                 <div className="flex gap-6 text-[11px] font-semibold text-white/50 uppercase tracking-widest pt-8 border-t border-white/10">
                     <span>Official Portal</span>
                     <span>·</span>

@@ -48,7 +48,7 @@ export const JURISDICTIONS_DATA: Record<string, { label: string, value: string }
         { label: "Geetanagar", value: "BHP-GEE" },
         { label: "Mangalpur", value: "BHP-MAN" },
         { label: "Sharadpur", value: "BHP-SHA" },
-        { label: "Gongabu", value: "BHP-GON" }, // as per prompt instructions
+        { label: "Gongabu", value: "BHP-GON" }, 
         { label: "Unknown Street", value: "BHP-UNK" }
     ],
     "Biratnagar": [

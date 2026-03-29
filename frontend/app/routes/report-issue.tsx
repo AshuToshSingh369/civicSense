@@ -101,6 +101,18 @@ export default function ReportIssue() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            const maxSizeMB = 10;
+            if (file.size > maxSizeMB * 1024 * 1024) {
+                showToast(`❌ File too large. Maximum size is ${maxSizeMB}MB.`);
+                e.target.value = '';
+                return;
+            }
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showToast('❌ Invalid file type. Only JPEG, PNG, and WEBP are allowed.');
+                e.target.value = '';
+                return;
+            }
             setFormData(prev => ({ ...prev, imageFile: file }));
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -114,11 +126,11 @@ export default function ReportIssue() {
     return (
         <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 selection:bg-primary selection:text-white flex flex-col relative overflow-x-hidden">
             
-            {/* Ambient Background Glows */}
+            
             <div className="fixed top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-50 to-transparent pointer-events-none -z-10" />
             <div className="fixed -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none -z-10" />
 
-            {/* Toast */}
+            
             {toastMsg && (
                 <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[1000] bg-white border border-primary/20 text-slate-900 font-bold text-sm px-6 py-3 rounded-full shadow-xl flex items-center gap-3 animate-slide-up">
                     <span className="material-symbols-outlined text-primary text-[20px]">task_alt</span>
@@ -126,7 +138,7 @@ export default function ReportIssue() {
                 </div>
             )}
 
-            {/* Header */}
+            
             <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
@@ -147,10 +159,10 @@ export default function ReportIssue() {
 
             <main className="flex-grow flex flex-col max-w-5xl mx-auto w-full px-6 py-12 lg:py-20">
                 
-                {/* Stepper Header */}
+                
                 <div className="mb-12">
                     <div className="flex justify-between items-center max-w-md mx-auto relative mb-4">
-                        {/* Connecting Line */}
+                        
                         <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -z-10 -translate-y-1/2" />
                         <div 
                             className="absolute top-1/2 left-0 h-0.5 bg-primary transition-all duration-500 -z-10 -translate-y-1/2" 
@@ -170,10 +182,10 @@ export default function ReportIssue() {
                     </div>
                 </div>
 
-                {/* Wizard Container */}
+                
                 <div className="bg-white border border-slate-200 rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden relative">
                     
-                    {/* Step 1: Location */}
+                    
                     {step === 1 && (
                         <div className="fadeIn">
                             <div className="p-8 sm:p-12 border-b border-slate-100 bg-slate-50/50">
@@ -219,7 +231,7 @@ export default function ReportIssue() {
                         </div>
                     )}
 
-                    {/* Step 2: Evidence */}
+                    
                     {step === 2 && (
                         <div className="fadeIn">
                             <div className="p-8 sm:p-12 border-b border-slate-100 bg-slate-50/50">
@@ -282,7 +294,7 @@ export default function ReportIssue() {
                         </div>
                     )}
 
-                    {/* Step 3: Details */}
+                    
                     {step === 3 && (
                         <div className="fadeIn">
                             <div className="p-8 sm:p-12 border-b border-slate-100 bg-slate-50/50">
@@ -311,7 +323,7 @@ export default function ReportIssue() {
                         </div>
                     )}
 
-                    {/* Navigation Footer */}
+                    
                     <div className="p-8 sm:p-12 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
                         {step > 1 ? (
                              <button onClick={handleBack} className="flex-1 sm:flex-none px-8 py-4 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-sm uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
@@ -352,7 +364,7 @@ export default function ReportIssue() {
                     </div>
                 </div>
 
-                {/* Footer Info */}
+                
                 <div className="mt-12 flex flex-col sm:flex-row justify-between items-center gap-6 px-4">
                     <div className="flex items-center gap-6">
                         {[

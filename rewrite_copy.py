@@ -1,6 +1,6 @@
 import os
 
-# ─── Report Issue Page ───────────────────────────────────────────────────────
+
 report = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\report-issue.tsx"
 with open(report, "r", encoding="utf-8") as f:
     c = f.read()
@@ -54,7 +54,7 @@ with open(report, "w", encoding="utf-8") as f:
 print("report-issue.tsx ✓")
 
 
-# ─── Dashboard Page ───────────────────────────────────────────────────────────
+
 dash = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\dashboard.tsx"
 with open(dash, "r", encoding="utf-8") as f:
     c = f.read()
@@ -77,7 +77,7 @@ with open(dash, "w", encoding="utf-8") as f:
 print("dashboard.tsx ✓")
 
 
-# ─── Authority Dashboard ──────────────────────────────────────────────────────
+
 auth = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\authority-dashboard.tsx"
 with open(auth, "r", encoding="utf-8") as f:
     c = f.read()
@@ -127,7 +127,7 @@ with open(auth, "w", encoding="utf-8") as f:
 print("authority-dashboard.tsx ✓")
 
 
-# ─── Track Report Page ────────────────────────────────────────────────────────
+
 track = r"c:\Users\ashut\OneDrive\Desktop\A\civicsense\frontend\app\routes\track-report.tsx"
 with open(track, "r", encoding="utf-8") as f:
     c = f.read()

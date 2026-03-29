@@ -82,10 +82,10 @@ export default function Login() {
                     : "Access your authority dashboard to manage reports and coordinate resolutions."}
             />
 
-            {/* Right panel */}
+            
             <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white">
                 <div className="w-full max-w-md">
-                    {/* Logo */}
+                    
                     <div className="mb-10 text-center">
                         <Link to="/" className="inline-flex items-center gap-2 mb-8 group">
                             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white group-hover:bg-primary-dark transition-colors">
@@ -97,7 +97,7 @@ export default function Login() {
                         <p className="text-slate-500 text-sm">Sign in to your account to continue</p>
                     </div>
 
-                    {/* Role Toggle */}
+                    
                     <div className="flex bg-slate-100 p-1 rounded-xl mb-8">
                         {(["citizen", "authority"] as const).map(r => (
                             <button
@@ -115,7 +115,7 @@ export default function Login() {
                     </div>
 
                     <Form onSubmit={handleSubmit} className="space-y-5" noValidate>
-                        {/* Email */}
+                        
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                                 Email or Mobile Number
@@ -130,7 +130,7 @@ export default function Login() {
                             {errors.identifier && <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.identifier}</p>}
                         </div>
 
-                        {/* Password */}
+                        
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
                             <div className="relative">
@@ -172,7 +172,7 @@ export default function Login() {
                         </button>
                     </Form>
 
-                    {/* Divider */}
+                    
                     <div className="relative my-7">
                         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
                         <div className="relative flex justify-center text-xs text-slate-400 font-medium">
@@ -180,7 +180,7 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {/* Google */}
+                    
                     <a
                         href="http://localhost:5000/api/auth/google"
                         className="w-full flex items-center justify-center gap-3 border border-slate-200 text-slate-700 py-3 rounded-lg font-semibold text-sm shadow-sm hover:bg-slate-50 transition-all"

@@ -7,7 +7,7 @@ export default function PrivacyPolicy() {
 
     return (
         <div className="min-h-screen bg-background-muted font-sans text-text-main selection:bg-primary selection:text-white leading-relaxed relative overflow-hidden">
-            {/* Background Animated Elements */}
+            
             <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-none">
                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#0d93f21a] rounded-full blur-[120px] mix-blend-screen"></div>
                 <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-[#a855f71a] rounded-full blur-[120px] mix-blend-screen"></div>

@@ -12,7 +12,7 @@ export default [
     route("auth/success", "routes/auth.success.tsx"),
     route("auth/complete-profile", "routes/auth.complete-profile.tsx"),
 
-    // Protected Routes
+    
 
     layout("components/ProtectedRoute.tsx", [
         route("dashboard", "routes/dashboard.tsx"),

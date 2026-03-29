@@ -5,22 +5,22 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { sendOTP } = require('../services/notificationService');
 
-// ─── Token Helpers ─────────────────────────────────────────────────────────────
+
 
 const generateAccessToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-// Cookie options for httpOnly token
+
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
-    path: '/', // Explicitly set path to / to ensure cookie is sent to all routes
+    maxAge: 7 * 24 * 60 * 60 * 1000, 
+    path: '/', 
 };
 
-// Helper: build safe user payload (Token removed to enforce httpOnly cookie)
+
 const userPayload = (user) => ({
     _id: user.id || user._id,
     name: user.name,
@@ -28,9 +28,10 @@ const userPayload = (user) => ({
     role: user.role,
     departmentCode: user.departmentCode,
     homeDepartment: user.homeDepartment,
+    profilePhoto: user.profilePhoto || '',
 });
 
-// ─── Validation Rules ──────────────────────────────────────────────────────────
+
 
 const registerValidation = [
     body('name').trim().notEmpty().withMessage('Name is required'),
@@ -55,11 +56,11 @@ const createAuthorityValidation = [
     body('departmentCode').notEmpty().withMessage('Department code is required'),
 ];
 
-// ─── Controllers ───────────────────────────────────────────────────────────────
 
-// @desc    Register new user (Citizen only)
-// @route   POST /api/auth/register
-// @access  Public
+
+
+
+
 const registerUser = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -106,9 +107,9 @@ const registerUser = async (req, res) => {
     }
 };
 
-// @desc    Create Authority Account
-// @route   POST /api/auth/create-authority
-// @access  Private (Admin/Authority only)
+
+
+
 const createAuthority = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -153,9 +154,9 @@ const createAuthority = async (req, res) => {
     }
 };
 
-// @desc    Verify OTP
-// @route   POST /api/auth/verify
-// @access  Public
+
+
+
 const verifyOTP = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -192,9 +193,9 @@ const verifyOTP = async (req, res) => {
     }
 };
 
-// @desc    Authenticate a user
-// @route   POST /api/auth/login
-// @access  Public
+
+
+
 const loginUser = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -223,40 +224,40 @@ const loginUser = async (req, res) => {
     }
 };
 
-// @desc    Logout user - clear cookie
-// @route   POST /api/auth/logout
-// @access  Private
+
+
+
 const logoutUser = (req, res) => {
     res.clearCookie('accessToken');
     return res.status(200).json({ message: 'Logged out successfully' });
 };
 
-// @desc    Handle Google Auth Callback
-// @route   GET /api/auth/google/callback
-// @access  Public
+
+
+
 const googleCallback = (req, res) => {
-    // Passport will have attached the user to req.user
+    
     if (!req.user) {
         return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/login?error=GoogleAuthFailed`);
     }
 
-    // Generate token
+    
     const token = generateAccessToken(req.user._id);
 
-    // Set cookie
+    
     res.cookie('accessToken', token, cookieOptions);
 
-    // Get safe payload to send back to client via URL fragment or query parameter
-    // Since we are redirecting to the frontend, we can pass user data safely in the URL hash or query
+    
+    
     const payload = Buffer.from(JSON.stringify(userPayload(req.user))).toString('base64');
 
-    // Redirect to frontend auth-success page that will grab the data and redirect to dashboard
+    
     res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth/success?data=${payload}`);
 };
 
-// @desc    Update user profile (specifically for location completion)
-// @route   PUT /api/auth/profile
-// @access  Private
+
+
+
 const updateProfile = async (req, res) => {
     const { homeDepartment, departmentCode } = req.body;
 
@@ -278,6 +279,27 @@ const updateProfile = async (req, res) => {
     }
 };
 
+const updateProfilePhoto = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Please upload an image' });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.profilePhoto = req.file.path || req.file.filename;
+        const updatedUser = await user.save();
+
+        return res.json(userPayload(updatedUser));
+    } catch (error) {
+        console.error('Error updating profile photo:', error);
+        return res.status(500).json({ message: 'Server error updating profile photo' });
+    }
+};
+
 module.exports = {
     registerUser,
     registerValidation,
@@ -290,4 +312,5 @@ module.exports = {
     logoutUser,
     googleCallback,
     updateProfile,
+    updateProfilePhoto,
 };
